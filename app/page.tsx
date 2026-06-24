@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { HeroSection } from '@/components/hero'
+import { FeatureSection } from '@/components/feature-section'
+import { TestimonialsSection } from '@/components/testimonials-section'
+import { CallToAction } from '@/components/cta'
+import { DecorIcon } from '@/components/decor-icon'
 import { getAllProducts, buildCatalogView } from '@/lib/catalog'
 import { homeMeta } from '@/lib/seo'
 import { copy } from '@/content/copy'
@@ -20,86 +23,69 @@ export default function HomePage() {
   const catalogCards = buildCatalogView(products)
 
   return (
-    <>
-      {/* ── Hero ── */}
-      <section className="relative bg-gradient-to-b from-primary/5 to-background py-20 md:py-28">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl mb-6 text-foreground">
-            {copy.heroHeadline}
-          </h1>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground mb-8">
-            {copy.heroDescription}
-          </p>
-          <Link href="/kontak" className={cn(buttonVariants({ size: 'lg' }))}>
-            {copy.heroCta}
-            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+    <div className="flex flex-col gap-16 md:gap-24 pb-20 overflow-x-hidden bg-background">
+      {/* Hero Section */}
+      <HeroSection />
 
-      {/* ── Product highlights ── */}
-      <section className="py-16 md:py-20 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-2xl font-bold text-center mb-2 text-foreground">Produk Kami</h2>
-          <p className="text-center text-muted-foreground mb-10">
-            Solusi digital untuk berbagai kebutuhan UMKM Indonesia
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {catalogCards.map((card) => (
-              <Card key={card.slug} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <span className="text-xs font-medium text-primary uppercase tracking-wider mb-1 block">
-                    {card.niche}
-                  </span>
-                  <CardTitle className="text-lg">{card.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="mb-4">{card.shortDescription}</CardDescription>
-                  <Link
-                    href={card.href}
-                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-                  >
-                    Pelajari lebih lanjut
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Product highlights */}
+      <section className="relative mx-auto w-full max-w-5xl px-4 md:px-8">
+        <div className="relative border-y border-border/80 py-16 md:py-20">
+          <DecorIcon className="size-4" position="top-left" />
+          <DecorIcon className="size-4" position="top-right" />
+          <DecorIcon className="size-4" position="bottom-left" />
+          <DecorIcon className="size-4" position="bottom-right" />
 
-      {/* ── Value proposition ── */}
-      <section className="py-16 md:py-20 bg-muted/30">
-        <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-2">{copy.valuePropHeadline}</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">{copy.valuePropDescription}</p>
+            <h2 className="text-2xl font-extrabold md:text-3xl lg:text-4xl text-foreground mb-3">Produk Kami</h2>
+            <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
+              Solusi digital untuk berbagai kebutuhan operasional UMKM Indonesia
+            </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {copy.valuePropItems.map((item) => (
-              <div key={item.title} className="flex flex-col gap-3">
-                <CheckCircle className="h-8 w-8 text-primary" aria-hidden="true" />
-                <h3 className="font-semibold text-foreground">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-dashed divide-border/80 border border-dashed border-border/80 rounded-lg overflow-hidden bg-card">
+            {catalogCards.map((card) => (
+              <div key={card.slug} className="flex flex-col p-6 md:p-8 hover:bg-muted/10 transition-colors">
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                  {card.niche}
+                </span>
+                <h3 className="text-lg font-bold text-foreground mb-3">{card.name}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-grow">{card.shortDescription}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  render={<Link href={card.href} />}
+                  nativeButton={false}
+                  className="self-start mt-auto"
+                >
+                  Pelajari Lebih Lanjut
+                  <ArrowRight className="ml-1 h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                </Button>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA banner ── */}
-      <section className="py-16 md:py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-2xl font-bold mb-4">Siap Tumbuh Bersama BantuGrow?</h2>
-          <p className="mb-8 opacity-90">
-            Hubungi kami sekarang dan temukan solusi terbaik untuk bisnis UMKM Anda.
+      {/* Value Proposition (Feature Section) */}
+      <FeatureSection />
+
+      {/* Testimonials Section */}
+      <section className="relative mx-auto w-full max-w-5xl px-4 md:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-2xl font-extrabold md:text-3xl lg:text-4xl text-foreground mb-3">Kata Mereka</h2>
+          <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
+            Bagaimana BantuGrow membantu pelaku UMKM mengembangkan bisnis mereka secara nyata
           </p>
-          <Link href="/kontak" className={cn(buttonVariants({ variant: 'secondary', size: 'lg' }))}>
-            {copy.heroCta}
-            <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-          </Link>
+        </div>
+        <div className="pb-16 md:pb-24">
+          <TestimonialsSection />
         </div>
       </section>
-    </>
+
+      {/* CTA Section */}
+      <section className="relative mx-auto w-full max-w-5xl px-4 md:px-8">
+        <CallToAction />
+      </section>
+    </div>
   )
 }

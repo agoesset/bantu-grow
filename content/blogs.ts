@@ -1,0 +1,51 @@
+export interface BlogPost {
+  slug: string
+  title: string
+  category: string
+  date: string
+  excerpt: string
+  author: string
+  content: string[] // Paragraphs of the article
+}
+
+export const blogs: BlogPost[] = [
+  {
+    slug: 'cara-mudah-kelola-stok-barang-umkm',
+    title: 'Cara Mudah Mengelola Stok Barang untuk UMKM Ritel',
+    category: 'UMKM & Ritel',
+    date: '24 Jun 2026',
+    excerpt: 'Pelajari bagaimana transisi dari pencatatan kertas ke sistem kasir digital dapat menghemat waktu dan mencegah kehilangan stok.',
+    author: 'Tim Retail BantuGrow',
+    content: [
+      'Mengelola stok barang sering kali menjadi momok bagi pemilik warung dan toko kelontong. Banyak pelaku usaha yang masih mengandalkan buku catatan manual untuk mencatat keluar-masuknya barang.',
+      'Sistem manual ini rentan terhadap kesalahan manusia, seperti lupa mencatat penjualan atau salah menghitung sisa stok. Akibatnya, pemilik usaha baru menyadari barang habis saat pelanggan ingin membelinya.',
+      'Dengan beralih ke sistem Point of Sale (POS) berbasis cloud, semua transaksi penjualan langsung memotong jumlah stok secara real-time. Anda juga bisa mendapatkan notifikasi otomatis saat stok barang tertentu sudah menipis, sehingga proses re-stock menjadi lebih terjadwal.'
+    ]
+  },
+  {
+    slug: 'strategi-efisiensi-operasional-travel-umroh',
+    title: 'Strategi Efisiensi Operasional Biro Perjalanan Umroh',
+    category: 'Manajemen Travel',
+    date: '22 Jun 2026',
+    excerpt: 'Tantangan mengelola ribuan dokumen jamaah secara manual dan bagaimana mengatasinya dengan sistem cloud terpadu.',
+    author: 'Travel Analyst BantuGrow',
+    content: [
+      'Mengelola biro perjalanan umroh melibatkan banyak detail dokumen yang rumit, mulai dari paspor, visa, vaksin, manifes penerbangan, hingga pembayaran cicilan jamaah.',
+      'Jika data ini tersebar di berbagai spreadsheet Excel yang berbeda, koordinasi tim lapangan dan kantor pusat akan menjadi sangat lambat dan berisiko memicu kesalahan manifes.',
+      'Implementasi sistem manajemen khusus travel umroh membantu memusatkan seluruh database jamaah. Mulai dari status kelengkapan dokumen hingga tracking pembayaran cicilan jamaah bisa dipantau langsung dalam satu dashboard terintegrasi.'
+    ]
+  },
+  {
+    slug: 'meningkatkan-konsistensi-ibadah-komunitas-digital',
+    title: 'Meningkatkan Konsistensi Ibadah Komunitas di Era Digital',
+    category: 'Komunitas',
+    date: '18 Jun 2026',
+    excerpt: 'Bagaimana pencatatan amalan secara digital (Mutabaah) dapat memotivasi anggota komunitas keagamaan.',
+    author: 'Komunitas BantuGrow',
+    content: [
+      'Konsistensi amalan ibadah harian seringkali lebih mudah dijaga ketika dilakukan bersama-sama dalam sebuah komunitas yang saling mendukung.',
+      'Namun, melakukan evaluasi amalan harian secara manual menggunakan kertas cetak sering kali tidak praktis dan sulit direkap oleh pengurus atau admin masjid/pesantren.',
+      'Aplikasi Mutabaah Digital hadir untuk mempermudah pencatatan amalan secara mandiri lewat smartphone. Admin dapat membuat program amal bulanan, memantau grafik perkembangan amalan kelompok, serta memberikan pengingat harian secara otomatis.'
+    ]
+  }
+]

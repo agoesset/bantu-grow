@@ -4,6 +4,7 @@ import { getAllProducts } from '@/lib/catalog'
 import { parseContactSubject } from '@/lib/contact-link'
 import { copy } from '@/content/copy'
 import { ContactForm } from './ContactForm'
+import { DecorIcon } from '@/components/decor-icon'
 
 const meta = contactMeta()
 
@@ -25,13 +26,22 @@ export default async function ContactPage({ searchParams }: PageProps) {
   const preSelected = parseContactSubject(urlParams, products)
 
   return (
-    <div className="container mx-auto px-4 md:px-6 py-12 md:py-16 max-w-2xl">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground mb-3">
-        {copy.contactHeadline}
-      </h1>
-      <p className="text-muted-foreground mb-8">{copy.contactDescription}</p>
+    <div className="mx-auto w-full max-w-2xl px-4 md:px-8 py-12 md:py-16">
+      <div className="relative border-y border-border/80 py-12 px-6 md:px-8 bg-card rounded-lg shadow-sm">
+        <DecorIcon className="size-4" position="top-left" />
+        <DecorIcon className="size-4" position="top-right" />
+        <DecorIcon className="size-4" position="bottom-left" />
+        <DecorIcon className="size-4" position="bottom-right" />
 
-      <ContactForm products={products} preSelectedSlug={preSelected?.slug} />
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground mb-3 md:text-4xl">
+          {copy.contactHeadline}
+        </h1>
+        <p className="text-muted-foreground mb-8 text-sm md:text-base leading-relaxed">
+          {copy.contactDescription}
+        </p>
+
+        <ContactForm products={products} preSelectedSlug={preSelected?.slug} />
+      </div>
     </div>
   )
 }

@@ -1,13 +1,14 @@
-import { products as defaultProducts, type Product } from '@/content/products'
+import { type Product } from '@/content/products'
+import { readProducts } from '@/lib/db'
 
 export { type Product }
 
 export function getAllProducts(): Product[] {
-  return defaultProducts
+  return readProducts()
 }
 
 export function getProductBySlug(slug: string): Product | undefined {
-  return defaultProducts.find((p) => p.slug === slug)
+  return readProducts().find((p) => p.slug === slug)
 }
 
 export interface ProductCardVM {

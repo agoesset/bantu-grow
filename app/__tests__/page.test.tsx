@@ -31,9 +31,9 @@ describe('Home page', () => {
 
   it('renders product highlights from catalog', () => {
     render(<HomePage />)
-    expect(screen.getByText(/mutaba'ah digital/i)).toBeInTheDocument()
-    expect(screen.getByText(/management travel umroh/i)).toBeInTheDocument()
-    expect(screen.getByText(/point of sale/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: /mutaba'ah digital/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: /management travel umroh/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 3, name: /point of sale/i })).toBeInTheDocument()
   })
 
   it('renders value proposition section', () => {
