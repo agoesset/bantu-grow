@@ -1,0 +1,43 @@
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import HomePage from '../page'
+
+// Mock Next.js Link
+vi.mock('next/link', () => ({
+  default: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: unknown }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}))
+
+describe('Home page', () => {
+  it('renders a single h1 with the hero headline', () => {
+    render(<HomePage />)
+    const headings = screen.getAllByRole('heading', { level: 1 })
+    expect(headings).toHaveLength(1)
+    expect(headings[0]).toHaveTextContent(/tumbuhkan bisnis umkm/i)
+  })
+
+  it('renders hero description text', () => {
+    render(<HomePage />)
+    expect(screen.getByText(/solusi perangkat lunak/i)).toBeInTheDocument()
+  })
+
+  it('renders a CTA button linking to /kontak', () => {
+    render(<HomePage />)
+    const ctaLinks = screen.getAllByRole('link', { name: /hubungi kami/i })
+    const hasKontakLink = ctaLinks.some((l) => l.getAttribute('href') === '/kontak')
+    expect(hasKontakLink).toBe(true)
+  })
+
+  it('renders product highlights from catalog', () => {
+    render(<HomePage />)
+    expect(screen.getByText(/mutaba'ah digital/i)).toBeInTheDocument()
+    expect(screen.getByText(/management travel umroh/i)).toBeInTheDocument()
+    expect(screen.getByText(/point of sale/i)).toBeInTheDocument()
+  })
+
+  it('renders value proposition section', () => {
+    render(<HomePage />)
+    expect(screen.getByText(/mengapa memilih bantugrow/i)).toBeInTheDocument()
+  })
+})

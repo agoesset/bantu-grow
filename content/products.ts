@@ -1,0 +1,62 @@
+export interface Product {
+  slug: string
+  name: string
+  niche: string
+  shortDescription: string
+  fullDescription: string
+  features: string[]
+}
+
+export const products: Product[] = [
+  {
+    slug: 'mutabaah-digital',
+    name: "Mutaba'ah Digital",
+    niche: 'Ibadah & Komunitas',
+    shortDescription:
+      'Solusi digital untuk mencatat dan memantau amalan ibadah harian komunitas Anda secara mudah dan terstruktur.',
+    fullDescription:
+      "Mutaba'ah Digital adalah platform SaaS yang membantu komunitas Muslim mencatat, memantau, dan mengevaluasi amalan ibadah harian. Dengan fitur mutaba'ah online, admin dapat membuat program amal, anggota mencatat progress secara mandiri, dan laporan rekapitulasi tersedia secara otomatis. Cocok untuk masjid, pesantren, komunitas kajian, maupun kelompok keluarga yang ingin menjaga konsistensi ibadah bersama.",
+    features: [
+      'Pencatatan amalan harian secara digital',
+      'Dashboard progres individu & kelompok',
+      'Manajemen program dan target amal',
+      'Laporan & rekapitulasi otomatis',
+      'Notifikasi pengingat ibadah',
+      'Akses multi-perangkat (web & mobile)',
+    ],
+  },
+  {
+    slug: 'management-travel-umroh',
+    name: 'Management Travel Umroh',
+    niche: 'Travel & Pariwisata Religi',
+    shortDescription:
+      'Sistem manajemen terpadu untuk agen travel umroh: pendaftaran jamaah, dokumen, pembayaran, hingga pemberangkatan.',
+    fullDescription:
+      'Management Travel Umroh adalah solusi SaaS lengkap untuk pengelolaan operasional biro perjalanan umroh. Mulai dari pendaftaran jamaah online, verifikasi dokumen, pengelolaan paket perjalanan, tracking pembayaran cicilan, hingga koordinasi keberangkatan — semua tersentralisasi dalam satu platform yang mudah digunakan. Kurangi kerja manual dan tingkatkan kepuasan jamaah dengan layanan yang lebih terorganisir.',
+    features: [
+      'Pendaftaran jamaah online & manajemen data peserta',
+      'Pengelolaan dokumen (paspor, visa, vaksin)',
+      'Manajemen paket umroh & harga',
+      'Tracking pembayaran & cicilan otomatis',
+      'Koordinasi manifest & jadwal keberangkatan',
+      'Laporan keuangan & rekap operasional',
+    ],
+  },
+  {
+    slug: 'pos',
+    name: 'Point of Sale (POS)',
+    niche: 'Ritel & UMKM',
+    shortDescription:
+      'Aplikasi kasir modern untuk UMKM: transaksi cepat, manajemen stok, laporan penjualan, dan multi-cabang.',
+    fullDescription:
+      'Point of Sale BantuGrow adalah sistem kasir berbasis cloud yang dirancang khusus untuk kebutuhan UMKM Indonesia. Proses transaksi menjadi lebih cepat dan akurat, stok terpantau secara real-time, dan laporan penjualan harian tersedia secara instan. Mendukung berbagai metode pembayaran termasuk tunai, transfer, dan QRIS. Cocok untuk warung, toko kelontong, minimarket, kafe, hingga usaha kuliner skala kecil hingga menengah.',
+    features: [
+      'Transaksi penjualan cepat & akurat',
+      'Manajemen stok & notifikasi barang menipis',
+      'Laporan penjualan harian, mingguan & bulanan',
+      'Dukungan multi-metode pembayaran (Tunai, Transfer, QRIS)',
+      'Manajemen multi-cabang dalam satu dashboard',
+      'Cetak struk & faktur otomatis',
+    ],
+  },
+]
