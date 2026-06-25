@@ -116,15 +116,15 @@ describe('getProductBySlug', () => {
     }
   )
 
-  it('returns a product by slug from the real product catalog', () => {
+  it('returns a product by slug from the real product catalog', async () => {
     // Validates: Requirements 3.2, 4.3
-    const product = getProductBySlug('pos')
+    const product = await getProductBySlug('pos')
     expect(product).toBeDefined()
     expect(product!.slug).toBe('pos')
   })
 
-  it('returns undefined for a non-existent slug', () => {
-    const product = getProductBySlug('non-existent-slug-xyz')
+  it('returns undefined for a non-existent slug', async () => {
+    const product = await getProductBySlug('non-existent-slug-xyz')
     expect(product).toBeUndefined()
   })
 })

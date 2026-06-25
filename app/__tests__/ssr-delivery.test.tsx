@@ -84,8 +84,9 @@ function htmlToText(html: string): string {
 // it back through the DOM so text-content assertions are encoding-agnostic.
 
 describe('SSR Delivery – primary content in server-rendered HTML (Req 9.3)', () => {
-  it('Home page: h1 headline and product names appear in server HTML', () => {
-    const html = renderToString(<HomePage />)
+  it('Home page: h1 headline and product names appear in server HTML', async () => {
+    const jsx = await HomePage()
+    const html = renderToString(jsx)
     const text = htmlToText(html)
     expect(text).toContain('Tumbuhkan Bisnis UMKM')
     expect(text).toContain("Mutaba'ah Digital")
@@ -94,8 +95,9 @@ describe('SSR Delivery – primary content in server-rendered HTML (Req 9.3)', (
     expect(text).toContain(copy.valuePropHeadline)
   })
 
-  it('Catalog page: h1 and all product cards appear in server HTML', () => {
-    const html = renderToString(<CatalogPage />)
+  it('Catalog page: h1 and all product cards appear in server HTML', async () => {
+    const jsx = await CatalogPage()
+    const html = renderToString(jsx)
     const text = htmlToText(html)
     expect(text).toContain(copy.catalogHeadline)
     expect(text).toContain("Mutaba'ah Digital")
@@ -134,7 +136,7 @@ describe('SSR Delivery – primary content in server-rendered HTML (Req 9.3)', (
   })
 
   it('All product detail pages: each product name is present in server HTML', async () => {
-    const products = getAllProducts()
+    const products = await getAllProducts()
     for (const product of products) {
       const jsx = await ProductDetailPage({
         params: Promise.resolve({ slug: product.slug }),
@@ -167,13 +169,15 @@ function assertAllImagesOptimized(container: HTMLElement, pageName: string) {
 }
 
 describe('Image pipeline – all <img> tags have responsive attributes (Req 8.2)', () => {
-  it('Home page contains no unoptimized <img> tags', () => {
-    const { container } = render(<HomePage />)
+  it('Home page contains no unoptimized <img> tags', async () => {
+    const jsx = await HomePage()
+    const { container } = render(jsx)
     assertAllImagesOptimized(container, 'HomePage')
   })
 
-  it('Catalog page contains no unoptimized <img> tags', () => {
-    const { container } = render(<CatalogPage />)
+  it('Catalog page contains no unoptimized <img> tags', async () => {
+    const jsx = await CatalogPage()
+    const { container } = render(jsx)
     assertAllImagesOptimized(container, 'CatalogPage')
   })
 
@@ -186,7 +190,7 @@ describe('Image pipeline – all <img> tags have responsive attributes (Req 8.2)
   })
 
   it('All product detail pages contain no unoptimized <img> tags', async () => {
-    const products = getAllProducts()
+    const products = await getAllProducts()
     for (const product of products) {
       const jsx = await ProductDetailPage({
         params: Promise.resolve({ slug: product.slug }),

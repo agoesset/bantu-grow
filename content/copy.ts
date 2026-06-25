@@ -85,8 +85,15 @@ export const copy = {
   // Navigation
   navHome: 'Beranda',
   navProducts: 'Produk',
+  navBlog: 'Blog',
   navAbout: 'Tentang',
   navContact: 'Kontak',
+
+  // Blog
+  blogHeadline: 'Artikel & Wawasan Terbaru',
+  blogDescription: 'Dapatkan tips praktis, panduan digitalisasi, dan kabar terbaru dari tim BantuGrow untuk bisnis Anda.',
+  blogReadMore: 'Baca Selengkapnya',
+  blogBackToList: 'Kembali ke Blog',
 
   // Footer
   footerDescription:

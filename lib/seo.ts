@@ -1,4 +1,5 @@
 import type { Product } from '@/content/products'
+import type { BlogPost } from '@/content/blogs'
 
 export interface PageMeta {
   title: string
@@ -45,3 +46,19 @@ export function contactMeta(): PageMeta {
       `Hubungi tim ${SITE_NAME} untuk informasi produk, demo, atau pertanyaan lainnya. Kami siap membantu bisnis UMKM Anda.`,
   }
 }
+
+export function blogListMeta(): PageMeta {
+  return {
+    title: `Blog & Wawasan — ${SITE_NAME}`,
+    description:
+      'Dapatkan tips praktis, panduan digitalisasi, dan kabar terbaru dari tim BantuGrow untuk bisnis Anda.',
+  }
+}
+
+export function blogPostMeta(post: BlogPost): PageMeta {
+  return {
+    title: `${post.title} — ${SITE_NAME}`,
+    description: post.excerpt,
+  }
+}
+

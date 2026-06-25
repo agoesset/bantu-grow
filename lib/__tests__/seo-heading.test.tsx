@@ -44,23 +44,27 @@ function countH1(container: HTMLElement): number {
 // ─── Property 8: Single primary heading per page ──────────────────────────────
 // Feature: bantugrow-company-profile, Property 8: Single primary heading per page
 describe('Single h1 per page', () => {
-  it('Home page has exactly one h1', () => {
-    const { container } = render(<HomePage />)
+  it('Home page has exactly one h1', async () => {
+    const jsx = await HomePage()
+    const { container } = render(jsx)
     expect(countH1(container)).toBe(1)
   })
 
-  it('Catalog page has exactly one h1', () => {
-    const { container } = render(<CatalogPage />)
+  it('Catalog page has exactly one h1', async () => {
+    const jsx = await CatalogPage()
+    const { container } = render(jsx)
     expect(countH1(container)).toBe(1)
   })
 
-  it('About page has exactly one h1', () => {
-    const { container } = render(<AboutPage />)
+  it('About page has exactly one h1', async () => {
+    const jsx = await AboutPage()
+    const { container } = render(jsx)
     expect(countH1(container)).toBe(1)
   })
 
-  it('GlobalNotFound page has exactly one h1', () => {
-    const { container } = render(<GlobalNotFound />)
+  it('GlobalNotFound page has exactly one h1', async () => {
+    const jsx = await GlobalNotFound()
+    const { container } = render(jsx)
     expect(countH1(container)).toBe(1)
   })
 
@@ -77,7 +81,7 @@ describe('Single h1 per page', () => {
 
   it(
     'Property 8: parameterized — every static page has exactly one h1',
-    () => {
+    async () => {
       // Validates: Requirements 9.2
       // We test all client-renderable pages parameterically
       const pages = [
@@ -88,7 +92,8 @@ describe('Single h1 per page', () => {
       ]
 
       for (const { name, Page } of pages) {
-        const { container } = render(<Page />)
+        const jsx = await (Page as () => Promise<React.ReactElement> | React.ReactElement)()
+        const { container } = render(jsx)
         const h1Count = countH1(container)
         expect(h1Count, `${name} page should have exactly 1 h1`).toBe(1)
       }
