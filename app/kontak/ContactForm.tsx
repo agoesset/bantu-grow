@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,7 +9,7 @@ import { submitLead, type SubmitLeadResult } from '@/app/actions/submit-lead'
 import { copy } from '@/content/copy'
 import type { Product } from '@/content/products'
 import type { ContactInput } from '@/lib/contact-validation'
-import { AlertCircle, CheckCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle, RotateCcw } from 'lucide-react'
 
 interface Props {
   products: Product[]
@@ -27,6 +27,8 @@ async function submitAction(
     email: (formData.get('email') as string) ?? '',
     message: (formData.get('message') as string) ?? '',
     productSlug: (formData.get('productSlug') as string) || undefined,
+    phone: (formData.get('phone') as string) || undefined,
+    companyName: (formData.get('companyName') as string) || undefined,
   }
   const honeypot = (formData.get('company_url') as string) ?? ''
   return submitLead(input, honeypot)
@@ -34,6 +36,7 @@ async function submitAction(
 
 export function ContactForm({ products, preSelectedSlug }: Props) {
   const [state, formAction, isPending] = useActionState(submitAction, initialState)
+  const [showForm, setShowForm] = useState(true)
 
   const retained =
     state?.status === 'validation_error'
@@ -48,7 +51,7 @@ export function ContactForm({ products, preSelectedSlug }: Props) {
   const getError = (field: 'name' | 'email' | 'message') =>
     errors.find((e) => e.field === field)
 
-  if (state?.status === 'success') {
+  if (state?.status === 'success' && showForm) {
     return (
       <div
         role="status"
@@ -57,13 +60,25 @@ export function ContactForm({ products, preSelectedSlug }: Props) {
       >
         <CheckCircle className="mx-auto h-12 w-12 text-emerald-500 mb-4 animate-bounce" />
         <h2 className="text-xl font-bold text-foreground mb-2">Pesan Terkirim!</h2>
-        <p className="text-muted-foreground text-sm max-w-sm mx-auto">{copy.contactSuccessMessage}</p>
+        <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">{copy.contactSuccessMessage}</p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowForm(false)}
+          className="inline-flex items-center gap-2"
+        >
+          <RotateCcw className="size-4" aria-hidden="true" />
+          Kirim Pesan Lagi
+        </Button>
       </div>
     )
   }
 
+  // If user clicked "Kirim Pesan Lagi", reset and show form
+  // We use a key trick: when showForm goes to false, we render the form fresh
+
   return (
-    <form action={formAction} className="w-full flex flex-col gap-6" noValidate>
+    <form action={formAction} className="w-full flex flex-col gap-6" noValidate key={showForm ? 'active' : 'reset'}>
       {/* Honeypot field - hidden from real users, bots will fill this */}
       <div className="absolute -left-[9999px]" aria-hidden="true">
         <label htmlFor="company_url">Company URL</label>
@@ -118,6 +133,32 @@ export function ContactForm({ products, preSelectedSlug }: Props) {
                 : copy.validationEmailRequired}
             </FieldError>
           )}
+        </Field>
+
+        {/* WhatsApp / Phone (optional) */}
+        <Field>
+          <FieldLabel htmlFor="phone">Nomor WhatsApp (Opsional)</FieldLabel>
+          <Input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="08xx-xxxx-xxxx"
+            defaultValue={retained?.phone ?? ''}
+            autoComplete="tel"
+          />
+        </Field>
+
+        {/* Company Name (optional) */}
+        <Field>
+          <FieldLabel htmlFor="companyName">Nama Perusahaan (Opsional)</FieldLabel>
+          <Input
+            id="companyName"
+            name="companyName"
+            type="text"
+            placeholder="Nama perusahaan atau usaha Anda"
+            defaultValue={retained?.companyName ?? ''}
+            autoComplete="organization"
+          />
         </Field>
 
         {/* Product subject (optional) */}

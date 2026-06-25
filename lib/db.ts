@@ -59,7 +59,9 @@ export async function getDb(): Promise<Database> {
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       message TEXT NOT NULL,
-      product_slug TEXT
+      product_slug TEXT,
+      phone TEXT,
+      company_name TEXT
     );
 
     CREATE TABLE IF NOT EXISTS newsletter_subscribers (
@@ -80,13 +82,23 @@ export async function getDb(): Promise<Database> {
         name TEXT NOT NULL,
         email TEXT NOT NULL,
         message TEXT NOT NULL,
-        product_slug TEXT
+        product_slug TEXT,
+        phone TEXT,
+        company_name TEXT
       );
       INSERT INTO leads_new (id, received_at, name, email, message, product_slug)
         SELECT COALESCE(id, received_at), received_at, name, email, message, product_slug FROM leads;
       DROP TABLE leads;
       ALTER TABLE leads_new RENAME TO leads;
     `)
+  }
+
+  // 2b. Migration: add phone and company_name columns to leads if missing
+  if (leadsSchema && !leadsSchema.sql.includes('phone')) {
+    await dbInstance.exec(`ALTER TABLE leads ADD COLUMN phone TEXT`)
+  }
+  if (leadsSchema && !leadsSchema.sql.includes('company_name')) {
+    await dbInstance.exec(`ALTER TABLE leads ADD COLUMN company_name TEXT`)
   }
 
   // 3. Migration: add content_markdown and cover_image columns to blogs if missing
@@ -295,6 +307,8 @@ export async function readLeads(): Promise<Lead[]> {
       email: string
       message: string
       product_slug: string | null
+      phone: string | null
+      company_name: string | null
     }[]>('SELECT * FROM leads')
 
     return rows.map((row) => ({
@@ -304,6 +318,8 @@ export async function readLeads(): Promise<Lead[]> {
       email: row.email,
       message: row.message,
       productSlug: row.product_slug || undefined,
+      phone: row.phone || undefined,
+      companyName: row.company_name || undefined,
     }))
   } catch (err) {
     console.error('Error reading leads from SQLite:', err)
@@ -314,9 +330,9 @@ export async function readLeads(): Promise<Lead[]> {
 export async function insertLead(lead: Lead): Promise<void> {
   const db = await getDb()
   await db.run(
-    `INSERT INTO leads (id, received_at, name, email, message, product_slug) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [lead.id, lead.receivedAt, lead.name, lead.email, lead.message, lead.productSlug || null]
+    `INSERT INTO leads (id, received_at, name, email, message, product_slug, phone, company_name) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [lead.id, lead.receivedAt, lead.name, lead.email, lead.message, lead.productSlug || null, lead.phone || null, lead.companyName || null]
   )
 }
 

@@ -7,6 +7,8 @@ export interface ContactInput {
   email: string
   message: string
   productSlug?: string
+  phone?: string
+  companyName?: string
 }
 
 export interface FieldError {
@@ -32,6 +34,8 @@ const contactSchema = z.object({
     .refine((v) => emailRegex.test(v), { message: 'invalid_email' }),
   message: z.string().min(1, 'required'),
   productSlug: z.string().optional(),
+  phone: z.string().optional(),
+  companyName: z.string().optional(),
 })
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

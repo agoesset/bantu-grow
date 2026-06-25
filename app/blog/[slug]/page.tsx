@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Clock, Share2 } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import { CallToAction } from '@/components/cta'
 import { DecorIcon } from '@/components/decor-icon'
@@ -12,9 +12,44 @@ import { blogPostMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 import { formatDate } from '@/lib/format-date'
 import { getBlogHtml } from '@/lib/markdown'
+import { ShareButtons } from '@/components/share-buttons'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+}
+
+function getReadingTime(text: string): number {
+  const words = text.trim().split(/\s+/).length
+  return Math.max(1, Math.ceil(words / 200))
+}
+
+function extractHeadings(html: string): { id: string; text: string; level: number }[] {
+  const headingRegex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi
+  const headings: { id: string; text: string; level: number }[] = []
+  let match
+
+  while ((match = headingRegex.exec(html)) !== null) {
+    const level = parseInt(match[1], 10)
+    const text = match[2].replace(/<[^>]*>/g, '') // strip inner HTML tags
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+    headings.push({ id, text, level })
+  }
+
+  return headings
+}
+
+function addHeadingIds(html: string): string {
+  return html.replace(/<h([2-3])([^>]*)>(.*?)<\/h([2-3])>/gi, (_match, level, attrs, content, _closeLevel) => {
+    const text = content.replace(/<[^>]*>/g, '')
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+    return `<h${level}${attrs} id="${id}">${content}</h${level}>`
+  })
 }
 
 export async function generateStaticParams() {
@@ -39,13 +74,21 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const htmlContent = getBlogHtml(post)
+  const rawHtml = getBlogHtml(post)
+  const htmlContent = addHeadingIds(rawHtml)
+  const headings = extractHeadings(htmlContent)
+
+  // Calculate reading time from raw text content
+  const textContent = post.contentMarkdown || post.content.join(' ')
+  const readingTime = getReadingTime(textContent)
 
   // Related articles: same category, excluding current, max 3
   const allBlogs = await getAllBlogs()
   const relatedPosts = allBlogs
     .filter((b) => b.category === post.category && b.slug !== post.slug)
     .slice(0, 3)
+
+  const shareUrl = `/blog/${slug}`
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 md:px-8 py-12 md:py-16">
@@ -91,13 +134,18 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Category & Date */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* Category, Date & Reading Time */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           <span className="text-xs font-semibold text-primary uppercase tracking-wider">
             {post.category}
           </span>
           <span className="text-muted-foreground text-xs">•</span>
           <span className="text-muted-foreground text-xs">{formatDate(post.date)}</span>
+          <span className="text-muted-foreground text-xs">•</span>
+          <span className="text-muted-foreground text-xs inline-flex items-center gap-1">
+            <Clock className="size-3" aria-hidden="true" />
+            {readingTime} menit membaca
+          </span>
         </div>
 
         {/* Article title */}
@@ -106,10 +154,42 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
         </h1>
 
         {/* Author info */}
-        <div className="text-sm text-muted-foreground mb-10 flex items-center gap-2">
+        <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
           <span>Oleh</span>
           <span className="font-semibold text-foreground">{post.author}</span>
         </div>
+
+        {/* Share buttons */}
+        <div className="mb-10 flex items-center gap-3">
+          <Share2 className="size-4 text-muted-foreground" aria-hidden="true" />
+          <span className="text-xs font-medium text-muted-foreground">Bagikan:</span>
+          <ShareButtons title={post.title} url={shareUrl} />
+        </div>
+
+        {/* Table of Contents */}
+        {headings.length >= 3 && (
+          <nav
+            aria-label="Daftar Isi"
+            className="mb-10 rounded-lg border border-border/60 bg-muted/20 p-4"
+          >
+            <h2 className="text-sm font-semibold text-foreground mb-3">Daftar Isi</h2>
+            <ol className="space-y-1.5">
+              {headings.map((h) => (
+                <li
+                  key={h.id}
+                  className={cn(
+                    "text-sm text-muted-foreground hover:text-foreground transition-colors",
+                    h.level === 3 && "ml-4"
+                  )}
+                >
+                  <a href={`#${h.id}`} className="hover:underline">
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
 
         {/* Body content - rendered markdown */}
         <div

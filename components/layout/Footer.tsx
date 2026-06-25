@@ -9,10 +9,19 @@ import { Button } from "@/components/ui/button"
 import { FullWidthDivider } from "@/components/full-width-divider"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { copy } from '@/content/copy'
+import { getActiveSocialLinks, type SocialLink } from '@/content/social-links'
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
 
+const socialIconMap: Record<SocialLink['platform'], React.ReactNode> = {
+	instagram: <InstagramIcon />,
+	x: <XIcon />,
+	github: <GithubIcon />,
+}
+
 export function Footer() {
+	const activeSocialLinks = getActiveSocialLinks()
+
 	return (
 		<footer
 			className={cn(
@@ -29,19 +38,21 @@ export function Footer() {
 					<p className="max-w-sm text-balance text-muted-foreground text-sm leading-relaxed">
 						{copy.footerDescription}
 					</p>
-					<div className="flex gap-2 mt-2">
-						{socialLinks.map((item, index) => (
-							<Button
-								key={`social-${item.link}-${index}`}
-								size="icon"
-								variant="outline"
-								render={<a href={item.link} target="_blank" rel="noopener noreferrer" />}
-								nativeButton={false}
-							>
-								{item.icon}
-							</Button>
-						))}
-					</div>
+					{activeSocialLinks.length > 0 && (
+						<div className="flex gap-2 mt-2">
+							{activeSocialLinks.map((item) => (
+								<Button
+									key={`social-${item.platform}`}
+									size="icon"
+									variant="outline"
+									render={<a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.label} />}
+									nativeButton={false}
+								>
+									{socialIconMap[item.platform]}
+								</Button>
+							))}
+						</div>
+					)}
 				</div>
 
 				<div className="col-span-2 w-full md:col-span-1">
@@ -137,19 +148,4 @@ const navLinks = [
 const legalLinks = [
 	{ title: "Kebijakan Privasi", href: "/privasi" },
 	{ title: "Syarat & Ketentuan", href: "/ketentuan" },
-]
-
-const socialLinks = [
-	{
-		icon: <InstagramIcon />,
-		link: "https://instagram.com/bantugrow",
-	},
-	{
-		icon: <XIcon />,
-		link: "https://x.com/bantugrow",
-	},
-	{
-		icon: <GithubIcon />,
-		link: "https://github.com/bantugrow",
-	},
 ]

@@ -6,41 +6,8 @@ import {
 } from "@/components/ui/avatar";
 import { DecorIcon } from "@/components/decor-icon";
 import { QuoteIcon } from "lucide-react";
-
-type Testimonial = {
-	quote: string;
-	name: string;
-	role: string;
-	company: string;
-	image: string;
-};
-
-const testimonials: Testimonial[] = [
-	{
-		quote:
-			"Dengan Point of Sale (POS) BantuGrow, pencatatan transaksi toko kelontong saya jadi otomatis dan stok barang terkontrol rapi. Tidak pusing lagi barang habis mendadak!",
-		image: "",
-		name: "Budi Santoso",
-		role: "Pemilik Toko",
-		company: "Toko Kelontong Berkah",
-	},
-	{
-		quote:
-			"Mutaba'ah Digital sangat membantu komunitas remaja masjid kami dalam mencatat amalan harian secara mandiri. Laporan perkembangannya sangat informatif dan memotivasi.",
-		image: "",
-		name: "Ustadz Ahmad",
-		role: "Ketua Yayasan",
-		company: "Masjid Baiturrahman",
-	},
-	{
-		quote:
-			"Sistem Management Travel Umroh mempermudah kami melacak kelengkapan dokumen dan progres pembayaran jamaah dalam satu dashboard. Sangat menghemat waktu operasional kami!",
-		image: "",
-		name: "Hajah Siti Aminah",
-		role: "Pemilik",
-		company: "Al-Hikmah Travel & Umroh",
-	},
-];
+import { testimonials, type Testimonial } from "@/content/testimonials";
+import Image from "next/image";
 
 export function TestimonialsSection() {
 	return (
@@ -96,10 +63,21 @@ function TestimonialCard({
 			</blockquote>
 
 			<figcaption className="flex items-center gap-3">
-				<Avatar className="size-10 rounded-full ring-2 ring-border ring-offset-2 ring-offset-background transition-shadow group-hover:ring-foreground/20">
-					<AvatarImage alt={`${name}'s profile picture`} src={image} />
-					<AvatarFallback>{name.charAt(0)}</AvatarFallback>
-				</Avatar>
+				{image ? (
+					<Image
+						src={image}
+						alt={`Foto profil ${name}`}
+						width={40}
+						height={40}
+						className="size-10 rounded-full ring-2 ring-border ring-offset-2 ring-offset-background"
+						unoptimized
+					/>
+				) : (
+					<Avatar className="size-10 rounded-full ring-2 ring-border ring-offset-2 ring-offset-background transition-shadow group-hover:ring-foreground/20">
+						<AvatarImage alt={`Foto profil ${name}`} src="" />
+						<AvatarFallback>{name.charAt(0)}</AvatarFallback>
+					</Avatar>
+				)}
 				<div className="flex flex-col">
 					<cite className="font-medium text-foreground text-sm not-italic">
 						{name}
