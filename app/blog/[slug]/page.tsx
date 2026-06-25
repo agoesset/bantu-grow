@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { getAllBlogs, getBlogBySlug } from '@/lib/blog'
 import { blogPostMeta } from '@/lib/seo'
 import { copy } from '@/content/copy'
+import { formatDate } from '@/lib/format-date'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -73,7 +74,7 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
             {post.category}
           </span>
           <span className="text-muted-foreground text-xs">•</span>
-          <span className="text-muted-foreground text-xs">{post.date}</span>
+          <span className="text-muted-foreground text-xs">{formatDate(post.date)}</span>
         </div>
 
         {/* Article title */}

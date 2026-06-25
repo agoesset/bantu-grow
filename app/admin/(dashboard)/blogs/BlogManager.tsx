@@ -6,6 +6,7 @@ import { saveBlog, deleteBlog } from '@/app/actions/admin'
 import { type BlogPost } from '@/content/blogs'
 import { Button } from '@/components/ui/button'
 import { Plus, Pencil, Trash2, X, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { formatDate } from '@/lib/format-date'
 
 interface BlogManagerProps {
   initialBlogs: BlogPost[]
@@ -42,17 +43,16 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
   const handleOpenAdd = () => {
     setIsNew(true)
     const today = new Date()
-    const formattedDate = today.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const isoDate = `${year}-${month}-${day}`
 
     setFormData({
       slug: '',
       title: '',
       category: '',
-      date: formattedDate,
+      date: isoDate,
       excerpt: '',
       author: 'Tim BantuGrow',
       contentMarkdown: '',
@@ -368,7 +368,7 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
                     <td className="px-6 py-4 hidden md:table-cell text-muted-foreground text-xs">
                       <div className="flex flex-col">
                         <span>Oleh: <strong className="text-foreground">{post.author}</strong></span>
-                        <span>{post.date}</span>
+                        <span>{formatDate(post.date)}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">

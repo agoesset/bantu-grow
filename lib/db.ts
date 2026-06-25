@@ -51,7 +51,8 @@ export async function getDb(): Promise<Database> {
     );
 
     CREATE TABLE IF NOT EXISTS leads (
-      received_at TEXT PRIMARY KEY,
+      id TEXT PRIMARY KEY,
+      received_at TEXT NOT NULL,
       name TEXT NOT NULL,
       email TEXT NOT NULL,
       message TEXT NOT NULL,
@@ -106,9 +107,9 @@ export async function getDb(): Promise<Database> {
         const items = JSON.parse(raw) as Lead[]
         for (const item of items) {
           await dbInstance.run(
-            `INSERT OR IGNORE INTO leads (received_at, name, email, message, product_slug) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [item.receivedAt, item.name, item.email, item.message, item.productSlug || null]
+            `INSERT OR IGNORE INTO leads (id, received_at, name, email, message, product_slug) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [item.id, item.receivedAt, item.name, item.email, item.message, item.productSlug || null]
           )
         }
       } catch (err) {
@@ -148,25 +149,26 @@ export async function readProducts(): Promise<Product[]> {
   }
 }
 
-export async function writeProducts(products: Product[]): Promise<void> {
+export async function insertProduct(product: Product): Promise<void> {
   const db = await getDb()
-  try {
-    await db.run('BEGIN TRANSACTION')
-    await db.run('DELETE FROM products')
-    for (const item of products) {
-      await db.run(
-        `INSERT INTO products (slug, name, niche, short_description, full_description, features) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [item.slug, item.name, item.niche, item.shortDescription, item.fullDescription, JSON.stringify(item.features)]
-      )
-    }
-    await db.run('COMMIT')
-  } catch (err) {
-    try {
-      await db.run('ROLLBACK')
-    } catch (_) {}
-    console.error('Error writing products to SQLite:', err)
-  }
+  await db.run(
+    `INSERT INTO products (slug, name, niche, short_description, full_description, features) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [product.slug, product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features)]
+  )
+}
+
+export async function updateProduct(product: Product): Promise<void> {
+  const db = await getDb()
+  await db.run(
+    `UPDATE products SET name = ?, niche = ?, short_description = ?, full_description = ?, features = ? WHERE slug = ?`,
+    [product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features), product.slug]
+  )
+}
+
+export async function deleteProductBySlug(slug: string): Promise<void> {
+  const db = await getDb()
+  await db.run('DELETE FROM products WHERE slug = ?', [slug])
 }
 
 // ─── Blogs CRUD ────────────────────────────────────────────────────────────────
@@ -199,25 +201,26 @@ export async function readBlogs(): Promise<BlogPost[]> {
   }
 }
 
-export async function writeBlogs(blogs: BlogPost[]): Promise<void> {
+export async function insertBlog(blog: BlogPost): Promise<void> {
   const db = await getDb()
-  try {
-    await db.run('BEGIN TRANSACTION')
-    await db.run('DELETE FROM blogs')
-    for (const item of blogs) {
-      await db.run(
-        `INSERT INTO blogs (slug, title, category, date, excerpt, author, content) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [item.slug, item.title, item.category, item.date, item.excerpt, item.author, JSON.stringify(item.content)]
-      )
-    }
-    await db.run('COMMIT')
-  } catch (err) {
-    try {
-      await db.run('ROLLBACK')
-    } catch (_) {}
-    console.error('Error writing blogs to SQLite:', err)
-  }
+  await db.run(
+    `INSERT INTO blogs (slug, title, category, date, excerpt, author, content) 
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [blog.slug, blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content)]
+  )
+}
+
+export async function updateBlog(blog: BlogPost): Promise<void> {
+  const db = await getDb()
+  await db.run(
+    `UPDATE blogs SET title = ?, category = ?, date = ?, excerpt = ?, author = ?, content = ? WHERE slug = ?`,
+    [blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content), blog.slug]
+  )
+}
+
+export async function deleteBlogBySlug(slug: string): Promise<void> {
+  const db = await getDb()
+  await db.run('DELETE FROM blogs WHERE slug = ?', [slug])
 }
 
 // ─── Leads CRUD ────────────────────────────────────────────────────────────────
@@ -226,6 +229,7 @@ export async function readLeads(): Promise<Lead[]> {
   const db = await getDb()
   try {
     const rows = await db.all<{
+      id: string
       received_at: string
       name: string
       email: string
@@ -234,6 +238,7 @@ export async function readLeads(): Promise<Lead[]> {
     }[]>('SELECT * FROM leads')
 
     return rows.map((row) => ({
+      id: row.id,
       receivedAt: row.received_at,
       name: row.name,
       email: row.email,
@@ -246,23 +251,16 @@ export async function readLeads(): Promise<Lead[]> {
   }
 }
 
-export async function writeLeads(leads: Lead[]): Promise<void> {
+export async function insertLead(lead: Lead): Promise<void> {
   const db = await getDb()
-  try {
-    await db.run('BEGIN TRANSACTION')
-    await db.run('DELETE FROM leads')
-    for (const item of leads) {
-      await db.run(
-        `INSERT INTO leads (received_at, name, email, message, product_slug) 
-         VALUES (?, ?, ?, ?, ?)`,
-        [item.receivedAt, item.name, item.email, item.message, item.productSlug || null]
-      )
-    }
-    await db.run('COMMIT')
-  } catch (err) {
-    try {
-      await db.run('ROLLBACK')
-    } catch (_) {}
-    console.error('Error writing leads to SQLite:', err)
-  }
+  await db.run(
+    `INSERT INTO leads (id, received_at, name, email, message, product_slug) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [lead.id, lead.receivedAt, lead.name, lead.email, lead.message, lead.productSlug || null]
+  )
+}
+
+export async function deleteLeadById(id: string): Promise<void> {
+  const db = await getDb()
+  await db.run('DELETE FROM leads WHERE id = ?', [id])
 }

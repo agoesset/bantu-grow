@@ -1,13 +1,19 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 import {
   readProducts,
-  writeProducts,
+  insertProduct,
+  updateProduct,
+  deleteProductBySlug,
   readBlogs,
-  writeBlogs,
+  insertBlog,
+  updateBlog,
+  deleteBlogBySlug,
   readLeads,
-  writeLeads
+  insertLead,
+  deleteLeadById,
 } from '@/lib/db'
 import { type Product } from '@/content/products'
 import { type BlogPost } from '@/content/blogs'
@@ -56,21 +62,18 @@ export async function saveProduct(
   }
 
   try {
-    const products = await readProducts()
     if (isNew) {
+      const products = await readProducts()
       const exists = products.some((p) => p.slug === product.slug)
       if (exists) {
         return { success: false, error: 'Slug produk sudah digunakan' }
       }
-      products.push(product)
+      await insertProduct(product)
     } else {
-      const idx = products.findIndex((p) => p.slug === product.slug)
-      if (idx === -1) {
-        return { success: false, error: 'Produk tidak ditemukan' }
-      }
-      products[idx] = product
+      await updateProduct(product)
     }
-    await writeProducts(products)
+    revalidatePath('/produk', 'page')
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -84,9 +87,9 @@ export async function deleteProduct(slug: string): Promise<{ success: boolean; e
   }
 
   try {
-    const products = await readProducts()
-    const filtered = products.filter((p) => p.slug !== slug)
-    await writeProducts(filtered)
+    await deleteProductBySlug(slug)
+    revalidatePath('/produk', 'page')
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -104,21 +107,18 @@ export async function saveBlog(
   }
 
   try {
-    const blogs = await readBlogs()
     if (isNew) {
+      const blogs = await readBlogs()
       const exists = blogs.some((b) => b.slug === post.slug)
       if (exists) {
         return { success: false, error: 'Slug artikel sudah digunakan' }
       }
-      blogs.push(post)
+      await insertBlog(post)
     } else {
-      const idx = blogs.findIndex((b) => b.slug === post.slug)
-      if (idx === -1) {
-        return { success: false, error: 'Artikel tidak ditemukan' }
-      }
-      blogs[idx] = post
+      await updateBlog(post)
     }
-    await writeBlogs(blogs)
+    revalidatePath('/blog', 'page')
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -132,9 +132,9 @@ export async function deleteBlog(slug: string): Promise<{ success: boolean; erro
   }
 
   try {
-    const blogs = await readBlogs()
-    const filtered = blogs.filter((b) => b.slug !== slug)
-    await writeBlogs(filtered)
+    await deleteBlogBySlug(slug)
+    revalidatePath('/blog', 'page')
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -159,16 +159,15 @@ export async function getLeadsList(): Promise<{ success: boolean; leads: Lead[];
   }
 }
 
-export async function deleteLead(receivedAt: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteLead(id: string): Promise<{ success: boolean; error?: string }> {
   const isAuthed = await checkAdminSession()
   if (!isAuthed) {
     return { success: false, error: 'Tidak terotorisasi' }
   }
 
   try {
-    const leads = await readLeads()
-    const filtered = leads.filter((l) => l.receivedAt !== receivedAt)
-    await writeLeads(filtered)
+    await deleteLeadById(id)
+    revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }

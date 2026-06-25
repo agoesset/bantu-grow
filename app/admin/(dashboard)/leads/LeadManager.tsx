@@ -17,17 +17,17 @@ export function LeadManager({ initialLeads }: LeadManagerProps) {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const handleDelete = async (receivedAt: string, e: React.MouseEvent) => {
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation() // Cegah memicu baris diklik (Eye modal)
     if (!window.confirm('Apakah Anda yakin ingin menghapus data pesan masuk ini?')) {
       return
     }
 
     try {
-      const res = await deleteLead(receivedAt)
+      const res = await deleteLead(id)
       if (res.success) {
-        setLeads(leads.filter((l) => l.receivedAt !== receivedAt))
-        if (selectedLead?.receivedAt === receivedAt) {
+        setLeads(leads.filter((l) => l.id !== id))
+        if (selectedLead?.id === id) {
           setSelectedLead(null)
         }
         startTransition(() => {
@@ -73,7 +73,7 @@ export function LeadManager({ initialLeads }: LeadManagerProps) {
               <tbody className="divide-y divide-border/80 text-sm text-foreground">
                 {leads.map((lead) => (
                   <tr
-                    key={lead.receivedAt}
+                    key={lead.id}
                     onClick={() => setSelectedLead(lead)}
                     className="hover:bg-muted/20 cursor-pointer transition-colors"
                   >
@@ -130,7 +130,7 @@ export function LeadManager({ initialLeads }: LeadManagerProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={(e) => handleDelete(lead.receivedAt, e)}
+                          onClick={(e) => handleDelete(lead.id, e)}
                           aria-label={`Hapus pesan dari ${lead.name}`}
                           className="h-8 w-8 text-destructive hover:bg-destructive/5"
                         >
@@ -212,7 +212,7 @@ export function LeadManager({ initialLeads }: LeadManagerProps) {
               <Button
                 variant="outline"
                 className="text-destructive border-destructive/20 hover:bg-destructive/5"
-                onClick={(e) => handleDelete(selectedLead.receivedAt, e)}
+                onClick={(e) => handleDelete(selectedLead.id, e)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Hapus Pesan

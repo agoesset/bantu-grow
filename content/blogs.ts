@@ -13,7 +13,7 @@ export const blogs: BlogPost[] = [
     slug: 'cara-mudah-kelola-stok-barang-umkm',
     title: 'Cara Mudah Mengelola Stok Barang untuk UMKM Ritel',
     category: 'UMKM & Ritel',
-    date: '24 Jun 2026',
+    date: '2026-06-24',
     excerpt: 'Pelajari bagaimana transisi dari pencatatan kertas ke sistem kasir digital dapat menghemat waktu dan mencegah kehilangan stok.',
     author: 'Tim Retail BantuGrow',
     content: [
@@ -26,7 +26,7 @@ export const blogs: BlogPost[] = [
     slug: 'strategi-efisiensi-operasional-travel-umroh',
     title: 'Strategi Efisiensi Operasional Biro Perjalanan Umroh',
     category: 'Manajemen Travel',
-    date: '22 Jun 2026',
+    date: '2026-06-22',
     excerpt: 'Tantangan mengelola ribuan dokumen jamaah secara manual dan bagaimana mengatasinya dengan sistem cloud terpadu.',
     author: 'Travel Analyst BantuGrow',
     content: [
@@ -39,7 +39,7 @@ export const blogs: BlogPost[] = [
     slug: 'meningkatkan-konsistensi-ibadah-komunitas-digital',
     title: 'Meningkatkan Konsistensi Ibadah Komunitas di Era Digital',
     category: 'Komunitas',
-    date: '18 Jun 2026',
+    date: '2026-06-18',
     excerpt: 'Bagaimana pencatatan amalan secara digital (Mutabaah) dapat memotivasi anggota komunitas keagamaan.',
     author: 'Komunitas BantuGrow',
     content: [

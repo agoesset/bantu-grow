@@ -22,6 +22,7 @@ export async function submitLead(
   // 2. Build Lead and record via sink
   const lead: Lead = {
     ...input,
+    id: crypto.randomUUID(),
     receivedAt: new Date().toISOString(),
   }
 
