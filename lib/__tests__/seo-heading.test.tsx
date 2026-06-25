@@ -29,12 +29,12 @@ vi.mock('@/lib/catalog', async (importOriginal) => {
   return { ...original }
 })
 
-import HomePage from '@/app/page'
-import CatalogPage from '@/app/produk/page'
-import AboutPage from '@/app/tentang/page'
-import GlobalNotFound from '@/app/not-found'
+import HomePage from '@/app/(public)/page'
+import CatalogPage from '@/app/(public)/produk/page'
+import AboutPage from '@/app/(public)/tentang/page'
+import GlobalNotFound from '@/app/(public)/not-found'
 import { products } from '@/content/products'
-import { ContactForm } from '@/app/kontak/ContactForm'
+import { ContactForm } from '@/app/(public)/kontak/ContactForm'
 
 // Helper to count h1 elements in rendered output
 function countH1(container: HTMLElement): number {
