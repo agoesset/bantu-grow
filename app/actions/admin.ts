@@ -56,7 +56,7 @@ export async function saveProduct(
   }
 
   try {
-    const products = readProducts()
+    const products = await readProducts()
     if (isNew) {
       const exists = products.some((p) => p.slug === product.slug)
       if (exists) {
@@ -70,7 +70,7 @@ export async function saveProduct(
       }
       products[idx] = product
     }
-    writeProducts(products)
+    await writeProducts(products)
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -84,9 +84,9 @@ export async function deleteProduct(slug: string): Promise<{ success: boolean; e
   }
 
   try {
-    const products = readProducts()
+    const products = await readProducts()
     const filtered = products.filter((p) => p.slug !== slug)
-    writeProducts(filtered)
+    await writeProducts(filtered)
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -104,7 +104,7 @@ export async function saveBlog(
   }
 
   try {
-    const blogs = readBlogs()
+    const blogs = await readBlogs()
     if (isNew) {
       const exists = blogs.some((b) => b.slug === post.slug)
       if (exists) {
@@ -118,7 +118,7 @@ export async function saveBlog(
       }
       blogs[idx] = post
     }
-    writeBlogs(blogs)
+    await writeBlogs(blogs)
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -132,9 +132,9 @@ export async function deleteBlog(slug: string): Promise<{ success: boolean; erro
   }
 
   try {
-    const blogs = readBlogs()
+    const blogs = await readBlogs()
     const filtered = blogs.filter((b) => b.slug !== slug)
-    writeBlogs(filtered)
+    await writeBlogs(filtered)
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
@@ -149,7 +149,7 @@ export async function getLeadsList(): Promise<{ success: boolean; leads: Lead[];
   }
 
   try {
-    const leads = readLeads()
+    const leads = await readLeads()
     const sorted = [...leads].sort(
       (a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime()
     )
@@ -166,9 +166,9 @@ export async function deleteLead(receivedAt: string): Promise<{ success: boolean
   }
 
   try {
-    const leads = readLeads()
+    const leads = await readLeads()
     const filtered = leads.filter((l) => l.receivedAt !== receivedAt)
-    writeLeads(filtered)
+    await writeLeads(filtered)
     return { success: true }
   } catch (err) {
     return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }

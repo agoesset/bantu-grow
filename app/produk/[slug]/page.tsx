@@ -14,13 +14,13 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const products = getAllProducts()
+  const products = await getAllProducts()
   return products.map((p) => ({ slug: p.slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  const product = await getProductBySlug(slug)
   if (!product) {
     return { title: 'Produk Tidak Ditemukan — BantuGrow' }
   }
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  const product = await getProductBySlug(slug)
 
   if (!product) {
     notFound()

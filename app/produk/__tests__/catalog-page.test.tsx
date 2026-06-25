@@ -22,36 +22,41 @@ import CatalogPage from '../page'
 import * as catalog from '@/lib/catalog'
 
 describe('CatalogPage', () => {
-  it('renders the catalog headline', () => {
-    render(<CatalogPage />)
+  it('renders the catalog headline', async () => {
+    const jsx = await CatalogPage()
+    render(jsx)
     const h1 = screen.getByRole('heading', { level: 1 })
     expect(h1).toHaveTextContent(/produk kami/i)
   })
 
-  it('renders product cards when products exist', () => {
-    render(<CatalogPage />)
+  it('renders product cards when products exist', async () => {
+    const jsx = await CatalogPage()
+    render(jsx)
     expect(screen.getByText(/mutaba'ah digital/i)).toBeInTheDocument()
     expect(screen.getByText(/management travel umroh/i)).toBeInTheDocument()
     expect(screen.getByText(/point of sale/i)).toBeInTheDocument()
   })
 
-  it('shows niche labels on product cards', () => {
-    render(<CatalogPage />)
+  it('shows niche labels on product cards', async () => {
+    const jsx = await CatalogPage()
+    render(jsx)
     expect(screen.getByText(/ibadah & komunitas/i)).toBeInTheDocument()
   })
 
-  it('renders links to product detail pages', () => {
-    render(<CatalogPage />)
+  it('renders links to product detail pages', async () => {
+    const jsx = await CatalogPage()
+    render(jsx)
     const detailLinks = screen.getAllByRole('link', { name: /lihat detail/i })
     expect(detailLinks.length).toBeGreaterThan(0)
     const hasSlugLink = detailLinks.some((l) => l.getAttribute('href')?.startsWith('/produk/'))
     expect(hasSlugLink).toBe(true)
   })
 
-  it('shows empty-catalog message when there are no products', () => {
+  it('shows empty-catalog message when there are no products', async () => {
     // Override getAllProducts to return empty array
-    vi.mocked(catalog.getAllProducts).mockReturnValueOnce([])
-    render(<CatalogPage />)
+    vi.mocked(catalog.getAllProducts).mockResolvedValueOnce([])
+    const jsx = await CatalogPage()
+    render(jsx)
     expect(
       screen.getByText(/belum ada produk yang tersedia/i)
     ).toBeInTheDocument()

@@ -4,9 +4,9 @@ import { ShoppingBag, BookOpen, MessageSquare, ArrowRight, Clock } from 'lucide-
 import React from 'react'
 
 export default async function AdminDashboardPage() {
-  const products = readProducts()
-  const blogs = readBlogs()
-  const leads = readLeads()
+  const products = await readProducts()
+  const blogs = await readBlogs()
+  const leads = await readLeads()
 
   const stats = [
     {

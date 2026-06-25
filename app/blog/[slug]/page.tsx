@@ -15,13 +15,13 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const blogs = getAllBlogs()
+  const blogs = await getAllBlogs()
   return blogs.map((b) => ({ slug: b.slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const post = getBlogBySlug(slug)
+  const post = await getBlogBySlug(slug)
   if (!post) {
     return { title: 'Artikel Tidak Ditemukan — BantuGrow' }
   }
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPostDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const post = getBlogBySlug(slug)
+  const post = await getBlogBySlug(slug)
 
   if (!post) {
     notFound()

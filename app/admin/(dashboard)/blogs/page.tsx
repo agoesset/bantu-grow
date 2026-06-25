@@ -5,6 +5,6 @@ import React from 'react'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminBlogsPage() {
-  const blogs = readBlogs()
+  const blogs = await readBlogs()
   return <BlogManager initialBlogs={blogs} />
 }

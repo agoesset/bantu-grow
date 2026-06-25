@@ -3,10 +3,11 @@ import { readBlogs } from '@/lib/db'
 
 export { type BlogPost }
 
-export function getAllBlogs(): BlogPost[] {
-  return readBlogs()
+export async function getAllBlogs(): Promise<BlogPost[]> {
+  return await readBlogs()
 }
 
-export function getBlogBySlug(slug: string): BlogPost | undefined {
-  return readBlogs().find((b) => b.slug === slug)
+export async function getBlogBySlug(slug: string): Promise<BlogPost | undefined> {
+  const blogs = await readBlogs()
+  return blogs.find((b) => b.slug === slug)
 }

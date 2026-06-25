@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: meta.description,
 }
 
-export default function BlogArchivePage() {
-  const posts = getAllBlogs()
+export default async function BlogArchivePage() {
+  const posts = await getAllBlogs()
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 md:px-8 py-12 md:py-16 flex flex-col gap-16">

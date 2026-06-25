@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   description: meta.description,
 }
 
-export default function HomePage() {
-  const products = getAllProducts()
+export default async function HomePage() {
+  const products = await getAllProducts()
   const catalogCards = buildCatalogView(products)
 
   return (

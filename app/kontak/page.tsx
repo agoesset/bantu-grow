@@ -19,7 +19,7 @@ interface PageProps {
 
 export default async function ContactPage({ searchParams }: PageProps) {
   const params = await searchParams
-  const products = getAllProducts()
+  const products = await getAllProducts()
 
   // Determine pre-selected product from query param
   const urlParams = new URLSearchParams(params.produk ? `produk=${params.produk}` : '')

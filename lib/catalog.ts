@@ -3,12 +3,13 @@ import { readProducts } from '@/lib/db'
 
 export { type Product }
 
-export function getAllProducts(): Product[] {
-  return readProducts()
+export async function getAllProducts(): Promise<Product[]> {
+  return await readProducts()
 }
 
-export function getProductBySlug(slug: string): Product | undefined {
-  return readProducts().find((p) => p.slug === slug)
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+  const products = await readProducts()
+  return products.find((p) => p.slug === slug)
 }
 
 export interface ProductCardVM {

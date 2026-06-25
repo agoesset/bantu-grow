@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+README.md
+vitest.config.ts
+vitest.setup.ts
+eslint.config.mjs
+.kiro
+.agents
+*.sqlite
+*.db
+content/data/bantugrow.db

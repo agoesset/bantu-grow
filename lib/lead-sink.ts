@@ -16,9 +16,9 @@ export const defaultLeadSink: LeadSink = {
   async record(lead: Lead): Promise<void> {
     console.log('[BantuGrow Lead]', JSON.stringify(lead, null, 2))
     try {
-      const currentLeads = readLeads()
+      const currentLeads = await readLeads()
       currentLeads.push(lead)
-      writeLeads(currentLeads)
+      await writeLeads(currentLeads)
     } catch (err) {
       console.error('[BantuGrow LeadSink] Failed to save lead to database file:', err)
     }

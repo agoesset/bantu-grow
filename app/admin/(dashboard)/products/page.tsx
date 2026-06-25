@@ -6,6 +6,6 @@ import React from 'react'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminProductsPage() {
-  const products = readProducts()
+  const products = await readProducts()
   return <ProductManager initialProducts={products} />
 }
