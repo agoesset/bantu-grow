@@ -2,7 +2,7 @@
   "id": "FEAT-002",
   "type": "fix",
   "description": "Fix 4 issues from code review: (1) updateProduct/updateBlog throw on 0 rows affected, (2) remove error swallowing in defaultLeadSink.record(), (3) add migration path for existing DBs without id column in leads table, (4) remove dead insertLead import from admin.ts.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Step 1 - In lib/db.ts: updateProduct and updateBlog should check the changes property from db.run() result, throw Error('Product not found') or Error('Blog not found') when changes === 0.",
     "Step 2 - In lib/lead-sink.ts: Remove try/catch around insertLead so errors propagate to the caller.",
@@ -24,5 +24,5 @@
     "Run npx vitest --run lib/__tests__/format-date.test.ts (must pass)"
   ],
   "blocked_reason": null,
-  "findings": null
+  "findings": "All 4 review issues resolved. TypeScript compiles clean (only pre-existing vitest globals errors in test files). Admin tests (14 tests) and format-date tests (7 tests) all pass. No regressions."
 }
