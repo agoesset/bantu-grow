@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
@@ -7,9 +8,10 @@ import { CallToAction } from '@/components/cta'
 import { DecorIcon } from '@/components/decor-icon'
 import { cn } from '@/lib/utils'
 import { getAllBlogs, getBlogBySlug } from '@/lib/blog'
-import { blogPostMeta, blogPostMetadata } from '@/lib/seo'
+import { blogPostMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 import { formatDate } from '@/lib/format-date'
+import { getBlogHtml } from '@/lib/markdown'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -36,6 +38,14 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
   if (!post) {
     notFound()
   }
+
+  const htmlContent = getBlogHtml(post)
+
+  // Related articles: same category, excluding current, max 3
+  const allBlogs = await getAllBlogs()
+  const relatedPosts = allBlogs
+    .filter((b) => b.category === post.category && b.slug !== post.slug)
+    .slice(0, 3)
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 md:px-8 py-12 md:py-16">
@@ -67,6 +77,20 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
         <DecorIcon className="size-4" position="bottom-left" />
         <DecorIcon className="size-4" position="bottom-right" />
 
+        {/* Cover Image */}
+        {post.coverImage && (
+          <div className="mb-8 rounded-lg overflow-hidden border border-border/40">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              width={800}
+              height={400}
+              className="w-full h-auto object-cover"
+              priority
+            />
+          </div>
+        )}
+
         {/* Category & Date */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xs font-semibold text-primary uppercase tracking-wider">
@@ -87,15 +111,49 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
           <span className="font-semibold text-foreground">{post.author}</span>
         </div>
 
-        {/* Body content */}
-        <div className="prose dark:prose-invert max-w-none text-muted-foreground leading-relaxed flex flex-col gap-6">
-          {post.content.map((para, idx) => (
-            <p key={idx} className="text-base md:text-lg">
-              {para}
-            </p>
-          ))}
-        </div>
+        {/* Body content - rendered markdown */}
+        <div
+          className="prose dark:prose-invert max-w-none text-muted-foreground leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
       </article>
+
+      {/* Related Articles */}
+      {relatedPosts.length > 0 && (
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Artikel Terkait</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {relatedPosts.map((related) => (
+              <Link
+                key={related.slug}
+                href={`/blog/${related.slug}`}
+                className="group border border-border/80 rounded-lg p-5 hover:bg-muted/10 transition-colors"
+              >
+                {related.coverImage && (
+                  <div className="mb-3 rounded overflow-hidden">
+                    <Image
+                      src={related.coverImage}
+                      alt={related.title}
+                      width={400}
+                      height={200}
+                      className="w-full h-32 object-cover"
+                    />
+                  </div>
+                )}
+                <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+                  {related.category}
+                </span>
+                <h3 className="text-sm font-bold text-foreground mt-1 line-clamp-2 group-hover:text-primary transition-colors">
+                  {related.title}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                  {related.excerpt}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA section */}
       <section className="relative">

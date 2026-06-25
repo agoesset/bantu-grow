@@ -5,7 +5,9 @@ export interface BlogPost {
   date: string
   excerpt: string
   author: string
-  content: string[] // Paragraphs of the article
+  content: string[] // Paragraphs of the article (legacy)
+  contentMarkdown?: string // Markdown content (preferred if present)
+  coverImage?: string // Optional cover image path
 }
 
 export const blogs: BlogPost[] = [

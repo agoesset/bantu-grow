@@ -28,6 +28,7 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
     excerpt: string
     author: string
     contentMarkdown: string
+    coverImage: string
   }>({
     slug: '',
     title: '',
@@ -36,6 +37,7 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
     excerpt: '',
     author: 'Tim BantuGrow',
     contentMarkdown: '',
+    coverImage: '',
   })
 
   const [error, setError] = useState<string | null>(null)
@@ -56,6 +58,7 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
       excerpt: '',
       author: 'Tim BantuGrow',
       contentMarkdown: '',
+      coverImage: '',
     })
     setError(null)
     setShowForm(true)
@@ -70,7 +73,8 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
       date: post.date,
       excerpt: post.excerpt,
       author: post.author,
-      contentMarkdown: post.content.join('\n\n'),
+      contentMarkdown: post.contentMarkdown || post.content.join('\n\n'),
+      coverImage: post.coverImage || '',
     })
     setError(null)
     setShowForm(true)
@@ -133,6 +137,8 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
       excerpt: formData.excerpt.trim(),
       author: formData.author.trim(),
       content,
+      contentMarkdown: formData.contentMarkdown.trim(),
+      coverImage: formData.coverImage.trim() || undefined,
     }
 
     try {
@@ -291,10 +297,24 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
             </div>
 
             <div className="space-y-2 md:col-span-2">
+              <label htmlFor="coverImage" className="text-sm font-semibold text-foreground">
+                URL Gambar Cover (Opsional)
+              </label>
+              <input
+                id="coverImage"
+                type="text"
+                value={formData.coverImage}
+                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
+                placeholder="Contoh: /images/blog-placeholder.svg"
+                className="block w-full rounded-lg border border-input bg-transparent py-2 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
               <label htmlFor="contentMarkdown" className="text-sm font-semibold text-foreground flex flex-col">
-                <span>Isi Artikel Lengkap</span>
+                <span>Isi Artikel Lengkap (Markdown)</span>
                 <span className="text-xs text-muted-foreground font-normal mt-0.5">
-                  Gunakan **jarak baris ganda (dua kali enter)** untuk memisahkan antar-paragraf di website.
+                  Mendukung Markdown: **bold**, *italic*, # heading, - list, [link](url), &gt; quote, ![gambar](url)
                 </span>
               </label>
               <textarea
@@ -303,7 +323,7 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
                 required
                 value={formData.contentMarkdown}
                 onChange={(e) => setFormData({ ...formData, contentMarkdown: e.target.value })}
-                placeholder="Tuliskan isi paragraf artikel di sini...&#10;&#10;Ini adalah contoh paragraf kedua setelah menekan enter dua kali."
+                placeholder="# Judul Bagian&#10;&#10;Tuliskan isi paragraf artikel di sini. Mendukung **bold**, *italic*, dan [link](url).&#10;&#10;- Item list 1&#10;- Item list 2"
                 className="block w-full rounded-lg border border-input bg-transparent py-2.5 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground resize-y leading-relaxed"
               />
             </div>

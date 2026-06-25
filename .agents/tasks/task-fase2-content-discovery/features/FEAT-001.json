@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-001",
+  "type": "feature",
+  "description": "Phase 2 - Content & Discovery: Rich blog content (markdown), cover images, blog category filter + pagination, product niche filter, search, and related items",
+  "status": "in_progress",
+  "steps": [
+    "2.1 Rich blog content with markdown support",
+    "2.2 Cover images for blogs and products",
+    "2.3 Blog category filter + pagination",
+    "2.4 Product niche filter",
+    "2.5 Search for blog and products",
+    "2.6 Related items (articles and products)"
+  ],
+  "acceptance_criteria": [
+    "Blog content renders markdown (headings, lists, links, quotes, images)",
+    "Blog posts can have cover images displayed on listing and detail pages",
+    "Products can have images displayed on catalog and detail pages",
+    "Blog listing supports category filtering via searchParams",
+    "Blog listing supports pagination (6 posts per page)",
+    "Product catalog supports niche filtering via searchParams",
+    "Blog and product pages have search input filtering by title/content",
+    "Blog detail page shows related articles from same category",
+    "Product detail page shows other products section",
+    "TypeScript compiles without errors",
+    "Existing tests still pass"
+  ],
+  "blocked_reason": null
+}

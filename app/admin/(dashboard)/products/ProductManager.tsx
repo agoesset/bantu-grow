@@ -26,6 +26,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
     shortDescription: string
     fullDescription: string
     featuresText: string
+    image: string
   }>({
     slug: '',
     name: '',
@@ -33,6 +34,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
     shortDescription: '',
     fullDescription: '',
     featuresText: '',
+    image: '',
   })
   
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +48,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       shortDescription: '',
       fullDescription: '',
       featuresText: '',
+      image: '',
     })
     setError(null)
     setShowForm(true)
@@ -60,6 +63,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       shortDescription: product.shortDescription,
       fullDescription: product.fullDescription,
       featuresText: product.features.join('\n'),
+      image: product.image || '',
     })
     setError(null)
     setShowForm(true)
@@ -115,6 +119,7 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
       shortDescription: formData.shortDescription.trim(),
       fullDescription: formData.fullDescription.trim(),
       features,
+      image: formData.image.trim() || undefined,
     }
 
     try {
@@ -254,6 +259,20 @@ export function ProductManager({ initialProducts }: ProductManagerProps) {
                 onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
                 placeholder="Penjelasan mendetail mengenai keunggulan dan tujuan produk..."
                 className="block w-full rounded-lg border border-input bg-transparent py-2 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground resize-y"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="image" className="text-sm font-semibold text-foreground">
+                URL Gambar Produk (Opsional)
+              </label>
+              <input
+                id="image"
+                type="text"
+                value={formData.image}
+                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                placeholder="Contoh: /images/product-placeholder.svg"
+                className="block w-full rounded-lg border border-input bg-transparent py-2 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground"
               />
             </div>
 

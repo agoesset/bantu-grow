@@ -37,7 +37,8 @@ export async function getDb(): Promise<Database> {
       niche TEXT NOT NULL,
       short_description TEXT NOT NULL,
       full_description TEXT NOT NULL,
-      features TEXT NOT NULL
+      features TEXT NOT NULL,
+      image TEXT
     );
 
     CREATE TABLE IF NOT EXISTS blogs (
@@ -47,7 +48,9 @@ export async function getDb(): Promise<Database> {
       date TEXT NOT NULL,
       excerpt TEXT NOT NULL,
       author TEXT NOT NULL,
-      content TEXT NOT NULL
+      content TEXT NOT NULL,
+      content_markdown TEXT,
+      cover_image TEXT
     );
 
     CREATE TABLE IF NOT EXISTS leads (
@@ -81,7 +84,26 @@ export async function getDb(): Promise<Database> {
     `)
   }
 
-  // 3. Auto-seeding jika database kosong
+  // 3. Migration: add content_markdown and cover_image columns to blogs if missing
+  const blogsSchema = await dbInstance.get<{ sql: string }>(
+    `SELECT sql FROM sqlite_master WHERE type='table' AND name='blogs'`
+  )
+  if (blogsSchema && !blogsSchema.sql.includes('content_markdown')) {
+    await dbInstance.exec(`ALTER TABLE blogs ADD COLUMN content_markdown TEXT`)
+  }
+  if (blogsSchema && !blogsSchema.sql.includes('cover_image')) {
+    await dbInstance.exec(`ALTER TABLE blogs ADD COLUMN cover_image TEXT`)
+  }
+
+  // 4. Migration: add image column to products if missing
+  const productsSchema = await dbInstance.get<{ sql: string }>(
+    `SELECT sql FROM sqlite_master WHERE type='table' AND name='products'`
+  )
+  if (productsSchema && !productsSchema.sql.includes('image')) {
+    await dbInstance.exec(`ALTER TABLE products ADD COLUMN image TEXT`)
+  }
+
+  // 5. Auto-seeding jika database kosong
   const productCountResult = await dbInstance.get<{ count: number }>('SELECT COUNT(*) as count FROM products')
   if (productCountResult && productCountResult.count === 0) {
     if (fs.existsSync(PRODUCTS_JSON)) {
@@ -90,9 +112,9 @@ export async function getDb(): Promise<Database> {
         const items = JSON.parse(raw) as Product[]
         for (const item of items) {
           await dbInstance.run(
-            `INSERT OR IGNORE INTO products (slug, name, niche, short_description, full_description, features) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [item.slug, item.name, item.niche, item.shortDescription, item.fullDescription, JSON.stringify(item.features)]
+            `INSERT OR IGNORE INTO products (slug, name, niche, short_description, full_description, features, image) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [item.slug, item.name, item.niche, item.shortDescription, item.fullDescription, JSON.stringify(item.features), item.image || null]
           )
         }
       } catch (err) {
@@ -109,9 +131,9 @@ export async function getDb(): Promise<Database> {
         const items = JSON.parse(raw) as BlogPost[]
         for (const item of items) {
           await dbInstance.run(
-            `INSERT OR IGNORE INTO blogs (slug, title, category, date, excerpt, author, content) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [item.slug, item.title, item.category, item.date, item.excerpt, item.author, JSON.stringify(item.content)]
+            `INSERT OR IGNORE INTO blogs (slug, title, category, date, excerpt, author, content, content_markdown, cover_image) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [item.slug, item.title, item.category, item.date, item.excerpt, item.author, JSON.stringify(item.content), item.contentMarkdown || null, item.coverImage || null]
           )
         }
       } catch (err) {
@@ -154,6 +176,7 @@ export async function readProducts(): Promise<Product[]> {
       short_description: string
       full_description: string
       features: string
+      image: string | null
     }[]>('SELECT * FROM products')
 
     return rows.map((row) => ({
@@ -163,6 +186,7 @@ export async function readProducts(): Promise<Product[]> {
       shortDescription: row.short_description,
       fullDescription: row.full_description,
       features: JSON.parse(row.features),
+      image: row.image || undefined,
     }))
   } catch (err) {
     console.error('Error reading products from SQLite:', err)
@@ -173,17 +197,17 @@ export async function readProducts(): Promise<Product[]> {
 export async function insertProduct(product: Product): Promise<void> {
   const db = await getDb()
   await db.run(
-    `INSERT INTO products (slug, name, niche, short_description, full_description, features) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [product.slug, product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features)]
+    `INSERT INTO products (slug, name, niche, short_description, full_description, features, image) 
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [product.slug, product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features), product.image || null]
   )
 }
 
 export async function updateProduct(product: Product): Promise<void> {
   const db = await getDb()
   const result = await db.run(
-    `UPDATE products SET name = ?, niche = ?, short_description = ?, full_description = ?, features = ? WHERE slug = ?`,
-    [product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features), product.slug]
+    `UPDATE products SET name = ?, niche = ?, short_description = ?, full_description = ?, features = ?, image = ? WHERE slug = ?`,
+    [product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features), product.image || null, product.slug]
   )
   if (result.changes === 0) {
     throw new Error('Product not found')
@@ -208,6 +232,8 @@ export async function readBlogs(): Promise<BlogPost[]> {
       excerpt: string
       author: string
       content: string
+      content_markdown: string | null
+      cover_image: string | null
     }[]>('SELECT * FROM blogs')
 
     return rows.map((row) => ({
@@ -218,6 +244,8 @@ export async function readBlogs(): Promise<BlogPost[]> {
       excerpt: row.excerpt,
       author: row.author,
       content: JSON.parse(row.content),
+      contentMarkdown: row.content_markdown || undefined,
+      coverImage: row.cover_image || undefined,
     }))
   } catch (err) {
     console.error('Error reading blogs from SQLite:', err)
@@ -228,17 +256,17 @@ export async function readBlogs(): Promise<BlogPost[]> {
 export async function insertBlog(blog: BlogPost): Promise<void> {
   const db = await getDb()
   await db.run(
-    `INSERT INTO blogs (slug, title, category, date, excerpt, author, content) 
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [blog.slug, blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content)]
+    `INSERT INTO blogs (slug, title, category, date, excerpt, author, content, content_markdown, cover_image) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [blog.slug, blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content), blog.contentMarkdown || null, blog.coverImage || null]
   )
 }
 
 export async function updateBlog(blog: BlogPost): Promise<void> {
   const db = await getDb()
   const result = await db.run(
-    `UPDATE blogs SET title = ?, category = ?, date = ?, excerpt = ?, author = ?, content = ? WHERE slug = ?`,
-    [blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content), blog.slug]
+    `UPDATE blogs SET title = ?, category = ?, date = ?, excerpt = ?, author = ?, content = ?, content_markdown = ?, cover_image = ? WHERE slug = ?`,
+    [blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content), blog.contentMarkdown || null, blog.coverImage || null, blog.slug]
   )
   if (result.changes === 0) {
     throw new Error('Blog not found')

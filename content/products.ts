@@ -5,6 +5,7 @@ export interface Product {
   shortDescription: string
   fullDescription: string
   features: string[]
+  image?: string // Optional product screenshot/image path
 }
 
 export const products: Product[] = [
