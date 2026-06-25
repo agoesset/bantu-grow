@@ -1,0 +1,7 @@
+{
+  "project_type": "Next.js 16 App Router",
+  "language": "TypeScript",
+  "build_command": "npx tsc --noEmit",
+  "test_command": "npx vitest --run",
+  "verification_instructions": "Run npx tsc --noEmit and npx vitest --run"
+}

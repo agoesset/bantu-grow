@@ -16,6 +16,10 @@ vi.mock('next/headers', () => {
   }
 })
 
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}))
+
 interface Product {
   slug: string
   name: string
@@ -36,11 +40,12 @@ interface BlogPost {
 }
 
 interface Lead {
+  id: string
   receivedAt: string
   name: string
   email: string
   message: string
-  product?: string
+  productSlug?: string
 }
 
 // Gunakan deklarasi global agar tidak bermasalah dengan Vitest hoisting closure
@@ -58,21 +63,38 @@ vi.mock('@/lib/db', () => ({
   readProducts: vi.fn().mockImplementation(() => {
     return globalThis.__mockProducts
   }),
-  writeProducts: vi.fn().mockImplementation((p) => {
-    globalThis.__mockProducts = p
+  insertProduct: vi.fn().mockImplementation((p: Product) => {
+    globalThis.__mockProducts.push(p)
+  }),
+  updateProduct: vi.fn().mockImplementation((p: Product) => {
+    const idx = globalThis.__mockProducts.findIndex((x) => x.slug === p.slug)
+    if (idx !== -1) globalThis.__mockProducts[idx] = p
+  }),
+  deleteProductBySlug: vi.fn().mockImplementation((slug: string) => {
+    globalThis.__mockProducts = globalThis.__mockProducts.filter((x) => x.slug !== slug)
   }),
   readBlogs: vi.fn().mockImplementation(() => {
     return globalThis.__mockBlogs
   }),
-  writeBlogs: vi.fn().mockImplementation((b) => {
-    globalThis.__mockBlogs = b
+  insertBlog: vi.fn().mockImplementation((b: BlogPost) => {
+    globalThis.__mockBlogs.push(b)
+  }),
+  updateBlog: vi.fn().mockImplementation((b: BlogPost) => {
+    const idx = globalThis.__mockBlogs.findIndex((x) => x.slug === b.slug)
+    if (idx !== -1) globalThis.__mockBlogs[idx] = b
+  }),
+  deleteBlogBySlug: vi.fn().mockImplementation((slug: string) => {
+    globalThis.__mockBlogs = globalThis.__mockBlogs.filter((x) => x.slug !== slug)
   }),
   readLeads: vi.fn().mockImplementation(() => {
     return globalThis.__mockLeads
   }),
-  writeLeads: vi.fn().mockImplementation((l) => {
-    globalThis.__mockLeads = l
-  })
+  insertLead: vi.fn().mockImplementation((l: Lead) => {
+    globalThis.__mockLeads.push(l)
+  }),
+  deleteLeadById: vi.fn().mockImplementation((id: string) => {
+    globalThis.__mockLeads = globalThis.__mockLeads.filter((x) => x.id !== id)
+  }),
 }))
 
 import {
@@ -96,11 +118,11 @@ describe('Admin Server Actions', () => {
     ]
     
     globalThis.__mockBlogs = [
-      { slug: 'b1', title: 'Blog 1', category: 'c', date: 'd', excerpt: 'e', author: 'a', content: [] }
+      { slug: 'b1', title: 'Blog 1', category: 'c', date: '2026-06-24', excerpt: 'e', author: 'a', content: [] }
     ]
     
     globalThis.__mockLeads = [
-      { receivedAt: '2026-06-25T00:00:00.000Z', name: 'User', email: 'user@test.com', message: 'Hi' }
+      { id: 'lead-uuid-1', receivedAt: '2026-06-25T00:00:00.000Z', name: 'User', email: 'user@test.com', message: 'Hi' }
     ]
   })
 
@@ -164,7 +186,7 @@ describe('Admin Server Actions', () => {
     })
 
     it('saves a new blog successfully', async () => {
-      const newBlog = { slug: 'b2', title: 'Blog 2', category: 'c', date: 'd', excerpt: 'e', author: 'a', content: [] }
+      const newBlog = { slug: 'b2', title: 'Blog 2', category: 'c', date: '2026-06-22', excerpt: 'e', author: 'a', content: [] }
       const res = await saveBlog(newBlog, true)
       expect(res.success).toBe(true)
       expect(globalThis.__mockBlogs).toHaveLength(2)
@@ -178,14 +200,14 @@ describe('Admin Server Actions', () => {
     })
 
     it('gets lead list sorted by date', async () => {
-      globalThis.__mockLeads.push({ receivedAt: '2026-06-26T00:00:00.000Z', name: 'User 2', email: 'user2@test.com', message: 'Hi 2' })
+      globalThis.__mockLeads.push({ id: 'lead-uuid-2', receivedAt: '2026-06-26T00:00:00.000Z', name: 'User 2', email: 'user2@test.com', message: 'Hi 2' })
       const res = await getLeadsList()
       expect(res.success).toBe(true)
       expect(res.leads[0].name).toBe('User 2')
     })
 
-    it('deletes a lead', async () => {
-      const res = await deleteLead('2026-06-25T00:00:00.000Z')
+    it('deletes a lead by id', async () => {
+      const res = await deleteLead('lead-uuid-1')
       expect(res.success).toBe(true)
       expect(globalThis.__mockLeads).toHaveLength(0)
     })

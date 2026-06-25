@@ -1,0 +1,36 @@
+{
+  "id": "FEAT-001",
+  "type": "refactor",
+  "description": "Refactor DB write operations from DELETE-all + INSERT-all pattern to per-row INSERT/UPDATE/DELETE. Add UUID primary key for leads. Standardize blog dates to ISO format. Add revalidatePath calls in admin actions.",
+  "status": "completed",
+  "steps": [
+    "Step 1 - Refactor lib/db.ts: Replace writeProducts() and writeBlogs() bulk functions with granular operations: insertProduct(product), updateProduct(product), deleteProduct(slug), insertBlog(blog), updateBlog(blog), deleteBlog(slug). Keep readProducts() and readBlogs() as-is. For leads: replace writeLeads() with insertLead(lead) and deleteLead(id). Add an 'id' TEXT column (UUID) as the new PRIMARY KEY for leads table, keeping received_at as a regular NOT NULL column. Add a migration step in getDb() that adds the id column if it doesn't exist (ALTER TABLE leads ADD COLUMN id TEXT; then UPDATE leads SET id = received_at WHERE id IS NULL, then recreate table with id as PK if needed - or simpler: drop and recreate since leads is ephemeral). Update the CREATE TABLE for leads to use 'id TEXT PRIMARY KEY' and keep received_at TEXT NOT NULL.",
+    "Step 2 - Update lib/lead-sink.ts: Change Lead interface to add 'id: string' field. In defaultLeadSink.record(), generate a UUID using crypto.randomUUID() and assign it to lead.id. Call the new insertLead() from db.ts instead of readLeads()+push+writeLeads(). Keep receivedAt as a timestamp field.",
+    "Step 3 - Update app/actions/submit-lead.ts: The lead creation now goes through defaultLeadSink which handles UUID generation. No changes needed here if lead-sink handles it. Verify the Lead type still works.",
+    "Step 4 - Refactor app/actions/admin.ts: Replace the read-all+modify+write-all pattern with direct per-row DB operations. saveProduct(product, isNew) should call insertProduct() or updateProduct() from db.ts. deleteProduct(slug) should call deleteProduct(slug) from db.ts. Same for saveBlog/deleteBlog. For deleteLead, change the parameter from receivedAt to id (the UUID), and call deleteLead(id) from db.ts. For getLeadsList(), keep using readLeads() but ensure it returns the id field. Add 'import { revalidatePath } from \"next/cache\"' and call revalidatePath('/produk', 'page') after product mutations, revalidatePath('/blog', 'page') after blog mutations, and revalidatePath('/admin', 'layout') after all mutations.",
+    "Step 5 - Update app/admin/(dashboard)/leads/LeadManager.tsx: Change handleDelete to use lead.id instead of lead.receivedAt for deletion. Update the key prop from lead.receivedAt to lead.id. Keep displaying receivedAt for the date column.",
+    "Step 6 - Create lib/format-date.ts: Export a formatDate(isoString: string, locale?: string) function that takes an ISO date string and returns a human-readable formatted date (e.g., '24 Jun 2026'). Use Intl.DateTimeFormat with locale 'id-ID' by default. Export a parseLooseDate(dateStr: string): string function that converts legacy free-format dates like '24 Jun 2026' to ISO format '2026-06-24'.",
+    "Step 7 - Standardize blog dates in content/blogs.ts and content/data/blogs.json: Change all date fields from free-format '24 Jun 2026' to ISO format '2026-06-24'. Update the seed data in getDb() to handle ISO dates.",
+    "Step 8 - Update blog rendering to use formatDate: In app/blog/[slug]/page.tsx, components/blogs-section.tsx, and app/admin/(dashboard)/blogs/BlogManager.tsx, import formatDate from lib/format-date.ts and use it to render post.date (which is now ISO) in a human-friendly format.",
+    "Step 9 - Update lib/blog.ts getAllBlogs() to sort blogs by date descending (ISO string comparison or Date parse). This ensures consistent date-based sorting.",
+    "Step 10 - Update tests: Update app/actions/__tests__/admin.test.ts to account for the new per-row DB function signatures. The mock of @/lib/db should now mock insertProduct, updateProduct, deleteProductBySlug (or whatever the final names are), insertBlog, updateBlog, deleteBlogBySlug, insertLead, deleteLeadById, plus readProducts, readBlogs, readLeads. Update the deleteLead test to pass an id instead of receivedAt. Add a test for lib/format-date.ts."
+  ],
+  "acceptance_criteria": [
+    "Updating 1 product calls UPDATE on that single row, not DELETE all + INSERT all",
+    "Deleting 1 blog calls DELETE WHERE slug = ? on that single row",
+    "Two leads submitted at the same millisecond get different UUIDs and don't conflict",
+    "Blog posts are sorted consistently by ISO date",
+    "Admin actions call revalidatePath after mutations",
+    "formatDate('2026-06-24') returns a localized date string",
+    "Existing passing tests (admin.test.ts and others) continue to pass after updates",
+    "TypeScript compilation succeeds (npx tsc --noEmit)"
+  ],
+  "verification": [
+    "Run npx tsc --noEmit to verify TypeScript compiles without errors",
+    "Run npx vitest --run app/actions/__tests__/admin.test.ts to verify admin tests pass",
+    "Run npx vitest --run lib/__tests__/ to verify lib-level tests pass (those not blocked by sqlite3)",
+    "Run npx vitest --run to check overall test status hasn't regressed"
+  ],
+  "blocked_reason": null,
+  "findings": "All 10 steps implemented successfully. TypeScript compiles clean (only pre-existing test file errors from missing vitest globals import). Admin tests (14 tests) and format-date tests (7 tests) all pass. 9 test files pass total (up from 8 before: added format-date.test.ts). The same 9 sqlite3-GLIBC failures remain as expected pre-existing issues. The BlogManager handleOpenAdd now generates ISO dates instead of locale-formatted dates."
+}

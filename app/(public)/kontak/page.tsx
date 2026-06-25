@@ -1,17 +1,12 @@
 import type { Metadata } from 'next'
-import { contactMeta } from '@/lib/seo'
+import { contactMetadata } from '@/lib/seo'
 import { getAllProducts } from '@/lib/catalog'
 import { parseContactSubject } from '@/lib/contact-link'
 import { copy } from '@/content/copy'
 import { ContactForm } from './ContactForm'
 import { DecorIcon } from '@/components/decor-icon'
 
-const meta = contactMeta()
-
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-}
+export const metadata: Metadata = contactMetadata()
 
 interface PageProps {
   searchParams: Promise<{ produk?: string }>

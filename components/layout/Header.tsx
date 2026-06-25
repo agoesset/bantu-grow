@@ -12,6 +12,7 @@ import { copy } from '@/content/copy'
 export const navLinks = [
 	{ href: '/', label: copy.navHome },
 	{ href: '/produk', label: copy.navProducts },
+	{ href: '/harga', label: copy.navPricing },
 	{ href: '/blog', label: copy.navBlog },
 	{ href: '/tentang', label: copy.navAbout },
 	{ href: '/kontak', label: copy.navContact },
@@ -45,8 +46,14 @@ export function Header() {
 						</Link>
 					))}
 					<Link
+						href="/demo"
+						className={cn(buttonVariants({ variant: "default", size: "sm" }), "ml-2")}
+					>
+						Minta Demo
+					</Link>
+					<Link
 						href="/kontak"
-						className={cn(buttonVariants({ variant: "outline", size: "sm" }), "ml-2")}
+						className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
 					>
 						Hubungi Kami
 					</Link>

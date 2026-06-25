@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Outfit, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { WhatsAppFab } from '@/components/whatsapp-fab'
 import { ThemeProvider } from '@/components/theme-provider'
 
 const outfit = Outfit({
@@ -37,6 +38,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/*
+          Plausible Analytics (privacy-friendly, no cookies)
+          To activate: uncomment the script below and set data-domain to your actual domain.
+          Sign up at https://plausible.io and add your domain there.
+        */}
+        {/* <script defer data-domain="bantugrow.id" src="https://plausible.io/js/script.js"></script> */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -55,9 +62,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <main className="flex-1">{children}</main>
+          <WhatsAppFab />
         </ThemeProvider>
       </body>
     </html>
   )
 }
-

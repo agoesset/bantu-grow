@@ -1,12 +1,34 @@
 import { readProducts, readBlogs, readLeads } from '@/lib/db'
 import Link from 'next/link'
-import { ShoppingBag, BookOpen, MessageSquare, ArrowRight, Clock } from 'lucide-react'
+import { ShoppingBag, BookOpen, MessageSquare, ArrowRight, Clock, BarChart3 } from 'lucide-react'
 import React from 'react'
+import { LeadChart } from './LeadChart'
 
 export default async function AdminDashboardPage() {
   const products = await readProducts()
   const blogs = await readBlogs()
   const leads = await readLeads()
+
+  // Calculate lead trends for last 7 days
+  const now = new Date()
+  const last7Days: { date: string; count: number }[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    const dateStr = d.toISOString().slice(0, 10)
+    const count = leads.filter((lead) => lead.receivedAt.slice(0, 10) === dateStr).length
+    last7Days.push({ date: dateStr, count })
+  }
+
+  // This week (last 7 days) vs last week (7-14 days ago)
+  const thisWeekCount = last7Days.reduce((sum, d) => sum + d.count, 0)
+  const last14Days: string[] = []
+  for (let i = 13; i >= 7; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    last14Days.push(d.toISOString().slice(0, 10))
+  }
+  const lastWeekCount = leads.filter((lead) => last14Days.includes(lead.receivedAt.slice(0, 10))).length
 
   const stats = [
     {
@@ -78,6 +100,24 @@ export default async function AdminDashboardPage() {
             </Link>
           )
         })}
+      </div>
+
+      {/* Lead Trends Chart */}
+      <div className="rounded-xl border border-border/80 bg-card shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-border/80 flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-bold text-foreground">
+            Tren Leads
+          </h3>
+        </div>
+        <div className="p-6">
+          <LeadChart
+            dailyLeads={last7Days}
+            totalLeads={leads.length}
+            thisWeekCount={thisWeekCount}
+            lastWeekCount={lastWeekCount}
+          />
+        </div>
       </div>
 
       {/* Recent Leads Section */}

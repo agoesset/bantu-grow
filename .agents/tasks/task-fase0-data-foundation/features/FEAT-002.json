@@ -1,0 +1,28 @@
+{
+  "id": "FEAT-002",
+  "type": "fix",
+  "description": "Fix 4 issues from code review: (1) updateProduct/updateBlog throw on 0 rows affected, (2) remove error swallowing in defaultLeadSink.record(), (3) add migration path for existing DBs without id column in leads table, (4) remove dead insertLead import from admin.ts.",
+  "status": "completed",
+  "steps": [
+    "Step 1 - In lib/db.ts: updateProduct and updateBlog should check the changes property from db.run() result, throw Error('Product not found') or Error('Blog not found') when changes === 0.",
+    "Step 2 - In lib/lead-sink.ts: Remove try/catch around insertLead so errors propagate to the caller.",
+    "Step 3 - In lib/db.ts getDb(): After CREATE TABLE IF NOT EXISTS statements, add a migration check that queries sqlite_master for the leads table schema. If it lacks 'id TEXT PRIMARY KEY', create leads_new with correct schema, copy data, drop old, rename.",
+    "Step 4 - In app/actions/admin.ts: Remove unused insertLead from the import statement."
+  ],
+  "acceptance_criteria": [
+    "updateProduct throws 'Product not found' when slug does not exist",
+    "updateBlog throws 'Blog not found' when slug does not exist",
+    "defaultLeadSink.record() propagates insert errors to caller",
+    "getDb() migrates an existing leads table that lacks an id column",
+    "No dead imports in app/actions/admin.ts",
+    "TypeScript compiles without errors in source files",
+    "Existing tests still pass"
+  ],
+  "verification": [
+    "Run npx tsc --noEmit 2>&1 | grep -v '__tests__' (no errors in source files)",
+    "Run npx vitest --run app/actions/__tests__/admin.test.ts (must pass)",
+    "Run npx vitest --run lib/__tests__/format-date.test.ts (must pass)"
+  ],
+  "blocked_reason": null,
+  "findings": "All 4 review issues resolved. TypeScript compiles clean (only pre-existing vitest globals errors in test files). Admin tests (14 tests) and format-date tests (7 tests) all pass. No regressions."
+}

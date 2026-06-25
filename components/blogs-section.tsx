@@ -4,6 +4,7 @@ import { GridFiller } from "@/components/grid-filler";
 import Link from "next/link";
 import { type BlogPost } from "@/lib/blog";
 import { copy } from "@/content/copy";
+import { formatDate } from "@/lib/format-date";
 
 interface BlogsSectionProps {
 	posts: BlogPost[];
@@ -26,7 +27,7 @@ export function BlogsSection({ posts }: BlogsSectionProps) {
 					<BlogCard
 						key={blog.slug}
 						title={blog.title}
-						date={blog.date}
+						date={formatDate(blog.date)}
 						category={blog.category}
 						author={blog.author}
 						description={blog.excerpt}
