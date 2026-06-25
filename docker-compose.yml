@@ -4,14 +4,19 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: bantugrow-app
-    ports:
-      - '3000:3000'
     volumes:
       - bantugrow-data:/data
+    env_file:
+      - .env
     environment:
       - DATABASE_PATH=/data/bantugrow.db
-      - ADMIN_PASSWORD=admin
     restart: always
+    networks:
+      - mutabaah-digital_default
 
 volumes:
   bantugrow-data:
+
+networks:
+  mutabaah-digital_default:
+    external: true

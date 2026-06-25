@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: 'BantuGrow — Solusi SaaS untuk UMKM Indonesia',
   description:
     'BantuGrow menyediakan solusi perangkat lunak (SaaS) yang dirancang khusus untuk membantu UMKM Indonesia berkembang lebih cepat, efisien, dan terorganisir.',
@@ -37,7 +38,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* 
+        {/*
           Plausible Analytics (privacy-friendly, no cookies)
           To activate: uncomment the script below and set data-domain to your actual domain.
           Sign up at https://plausible.io and add your domain there.
@@ -67,4 +68,3 @@ export default function RootLayout({
     </html>
   )
 }
-
