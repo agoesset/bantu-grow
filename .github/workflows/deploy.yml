@@ -13,9 +13,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -33,7 +30,6 @@ jobs:
             git reset --hard origin/main
 
             echo "=== Build and deploy ==="
-            sudo docker compose down
             sudo docker compose up -d --build
 
             echo "=== Cleanup old images ==="
@@ -41,12 +37,11 @@ jobs:
 
             echo "=== Health check ==="
             sleep 5
-            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/ || true
-            echo ""
+            curl -s -o /dev/null -w "Health check: %{http_code}\n" http://127.0.0.1:3000/ || true
 
             echo "=== Deploy finished ==="
 
       - name: Verify public URL
         run: |
           sleep 10
-          curl -s -o /dev/null -w "Status: %{http_code}\n" https://www.bantugrow.com/
+          curl -s -o /dev/null -w "Public status: %{http_code}\n" https://www.bantugrow.com/
