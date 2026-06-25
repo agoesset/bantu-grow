@@ -68,6 +68,25 @@ export async function getDb(): Promise<Database> {
       email TEXT PRIMARY KEY,
       subscribed_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS admin_users (
+      id TEXT PRIMARY KEY,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'admin' CHECK(role IN ('admin', 'editor')),
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS demo_requests (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      company TEXT,
+      product_interest TEXT,
+      preferred_time TEXT,
+      created_at TEXT NOT NULL
+    );
   `)
 
   // 2. Migration: ensure leads table has id column as PRIMARY KEY
@@ -339,4 +358,78 @@ export async function insertLead(lead: Lead): Promise<void> {
 export async function deleteLeadById(id: string): Promise<void> {
   const db = await getDb()
   await db.run('DELETE FROM leads WHERE id = ?', [id])
+}
+
+// ─── Demo Requests CRUD ────────────────────────────────────────────────────────
+
+export interface DemoRequest {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  company?: string
+  productInterest?: string
+  preferredTime?: string
+  createdAt: string
+}
+
+export async function insertDemoRequest(request: DemoRequest): Promise<void> {
+  const db = await getDb()
+  await db.run(
+    `INSERT INTO demo_requests (id, name, email, phone, company, product_interest, preferred_time, created_at) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [request.id, request.name, request.email, request.phone || null, request.company || null, request.productInterest || null, request.preferredTime || null, request.createdAt]
+  )
+}
+
+export async function readDemoRequests(): Promise<DemoRequest[]> {
+  const db = await getDb()
+  try {
+    const rows = await db.all<{
+      id: string
+      name: string
+      email: string
+      phone: string | null
+      company: string | null
+      product_interest: string | null
+      preferred_time: string | null
+      created_at: string
+    }[]>('SELECT * FROM demo_requests ORDER BY created_at DESC')
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      phone: row.phone || undefined,
+      company: row.company || undefined,
+      productInterest: row.product_interest || undefined,
+      preferredTime: row.preferred_time || undefined,
+      createdAt: row.created_at,
+    }))
+  } catch (err) {
+    console.error('Error reading demo requests from SQLite:', err)
+    return []
+  }
+}
+
+// ─── Admin Users (Multi-user structural prep) ──────────────────────────────────
+// TODO: Full multi-user migration - replace single-password login with per-user auth.
+// Currently the admin login still uses the single ADMIN_PASSWORD environment variable.
+// When ready to migrate:
+// 1. Seed admin_users table with bcrypt-hashed passwords
+// 2. Update loginAdmin action to verify against admin_users table
+// 3. Add session/JWT with user role info
+// 4. Implement role-based access (admin: full access, editor: blogs only)
+
+export async function seedDefaultAdminUser(): Promise<void> {
+  const db = await getDb()
+  const existing = await db.get<{ id: string }>('SELECT id FROM admin_users LIMIT 1')
+  if (!existing) {
+    // Seed a default admin user placeholder
+    // In production, replace with a proper bcrypt hash
+    await db.run(
+      `INSERT OR IGNORE INTO admin_users (id, username, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)`,
+      [crypto.randomUUID(), 'admin', '/* TODO: bcrypt hash of actual password */', 'admin', new Date().toISOString()]
+    )
+  }
 }

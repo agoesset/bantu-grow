@@ -167,3 +167,10 @@ export function careersMetadata(): Metadata {
     'Bergabunglah dengan tim BantuGrow dan bantu jutaan UMKM Indonesia bertumbuh melalui teknologi.'
   )
 }
+
+export function demoMetadata(): Metadata {
+  return buildMetadata(
+    `Minta Demo Gratis — ${SITE_NAME}`,
+    'Jadwalkan demo produk BantuGrow dan lihat langsung bagaimana solusi SaaS kami dapat membantu bisnis UMKM Anda berkembang.'
+  )
+}

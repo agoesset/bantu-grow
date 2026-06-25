@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import React, { useState, useTransition, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { saveBlog, deleteBlog } from '@/app/actions/admin'
 import { type BlogPost } from '@/content/blogs'
 import { Button } from '@/components/ui/button'
-import { Plus, Pencil, Trash2, X, Check, AlertCircle, Loader2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Check, AlertCircle, Loader2, Eye, EyeOff, Bold, Italic, Heading1, Link2, List } from 'lucide-react'
 import { formatDate } from '@/lib/format-date'
+import { renderMarkdown } from '@/lib/markdown'
 
 interface BlogManagerProps {
   initialBlogs: BlogPost[]
@@ -41,6 +42,39 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
   })
 
   const [error, setError] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Insert markdown syntax at cursor position
+  const insertMarkdown = useCallback((before: string, after: string = '') => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+
+    setFormData((prev) => {
+      const text = prev.contentMarkdown
+      const selected = text.slice(start, end)
+      const newText = text.slice(0, start) + before + selected + after + text.slice(end)
+      return { ...prev, contentMarkdown: newText }
+    })
+
+    // Restore cursor position after React re-render
+    requestAnimationFrame(() => {
+      textarea.focus()
+      const cursorPos = start + before.length + (end - start) + after.length
+      textarea.setSelectionRange(cursorPos, cursorPos)
+    })
+  }, [])
+
+  const toolbarActions = [
+    { icon: Bold, label: 'Bold', action: () => insertMarkdown('**', '**') },
+    { icon: Italic, label: 'Italic', action: () => insertMarkdown('*', '*') },
+    { icon: Heading1, label: 'Heading', action: () => insertMarkdown('## ') },
+    { icon: Link2, label: 'Link', action: () => insertMarkdown('[', '](url)') },
+    { icon: List, label: 'List', action: () => insertMarkdown('- ') },
+  ]
 
   const handleOpenAdd = () => {
     setIsNew(true)
@@ -317,15 +351,61 @@ export function BlogManager({ initialBlogs }: BlogManagerProps) {
                   Mendukung Markdown: **bold**, *italic*, # heading, - list, [link](url), &gt; quote, ![gambar](url)
                 </span>
               </label>
-              <textarea
-                id="contentMarkdown"
-                rows={12}
-                required
-                value={formData.contentMarkdown}
-                onChange={(e) => setFormData({ ...formData, contentMarkdown: e.target.value })}
-                placeholder="# Judul Bagian&#10;&#10;Tuliskan isi paragraf artikel di sini. Mendukung **bold**, *italic*, dan [link](url).&#10;&#10;- Item list 1&#10;- Item list 2"
-                className="block w-full rounded-lg border border-input bg-transparent py-2.5 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground resize-y leading-relaxed"
-              />
+
+              {/* Toolbar */}
+              <div className="flex items-center gap-1 border border-border/80 rounded-t-lg bg-muted/30 px-2 py-1.5">
+                {toolbarActions.map((tool) => {
+                  const Icon = tool.icon
+                  return (
+                    <button
+                      key={tool.label}
+                      type="button"
+                      onClick={tool.action}
+                      title={tool.label}
+                      className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </button>
+                  )
+                })}
+                <div className="flex-1" />
+                <button
+                  type="button"
+                  onClick={() => setShowPreview(!showPreview)}
+                  title={showPreview ? 'Sembunyikan Preview' : 'Tampilkan Preview'}
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPreview ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  {showPreview ? 'Tutup Preview' : 'Preview'}
+                </button>
+              </div>
+
+              {/* Editor / Preview */}
+              <div className={showPreview ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}>
+                <textarea
+                  id="contentMarkdown"
+                  ref={textareaRef}
+                  rows={12}
+                  required
+                  value={formData.contentMarkdown}
+                  onChange={(e) => setFormData({ ...formData, contentMarkdown: e.target.value })}
+                  placeholder="# Judul Bagian&#10;&#10;Tuliskan isi paragraf artikel di sini. Mendukung **bold**, *italic*, dan [link](url).&#10;&#10;- Item list 1&#10;- Item list 2"
+                  className="block w-full rounded-lg border border-input bg-transparent py-2.5 px-3 text-sm placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary text-foreground resize-y leading-relaxed rounded-t-none"
+                />
+                {showPreview && (
+                  <div className="rounded-lg border border-border/80 bg-muted/10 p-4 overflow-auto max-h-[400px]">
+                    <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Preview</div>
+                    <div
+                      className="prose prose-sm dark:prose-invert max-w-none text-foreground"
+                      dangerouslySetInnerHTML={{
+                        __html: formData.contentMarkdown.trim()
+                          ? renderMarkdown(formData.contentMarkdown)
+                          : '<p class="text-muted-foreground italic">Belum ada konten untuk di-preview...</p>',
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

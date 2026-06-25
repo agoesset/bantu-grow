@@ -60,7 +60,7 @@ export const pricingTiers: PricingTier[] = [
       'API access & integrasi khusus',
       'Pelatihan tim on-site',
     ],
-    cta: 'Hubungi Sales',
-    ctaHref: '/kontak?produk=enterprise',
+    cta: 'Minta Demo',
+    ctaHref: '/demo',
   },
 ]

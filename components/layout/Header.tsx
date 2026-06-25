@@ -46,8 +46,14 @@ export function Header() {
 						</Link>
 					))}
 					<Link
+						href="/demo"
+						className={cn(buttonVariants({ variant: "default", size: "sm" }), "ml-2")}
+					>
+						Minta Demo
+					</Link>
+					<Link
 						href="/kontak"
-						className={cn(buttonVariants({ variant: "outline", size: "sm" }), "ml-2")}
+						className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
 					>
 						Hubungi Kami
 					</Link>
