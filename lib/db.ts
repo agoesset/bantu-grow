@@ -60,7 +60,28 @@ export async function getDb(): Promise<Database> {
     );
   `)
 
-  // 2. Auto-seeding jika database kosong
+  // 2. Migration: ensure leads table has id column as PRIMARY KEY
+  const leadsSchema = await dbInstance.get<{ sql: string }>(
+    `SELECT sql FROM sqlite_master WHERE type='table' AND name='leads'`
+  )
+  if (leadsSchema && !leadsSchema.sql.includes('id TEXT PRIMARY KEY')) {
+    await dbInstance.exec(`
+      CREATE TABLE leads_new (
+        id TEXT PRIMARY KEY,
+        received_at TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        message TEXT NOT NULL,
+        product_slug TEXT
+      );
+      INSERT INTO leads_new (id, received_at, name, email, message, product_slug)
+        SELECT COALESCE(id, received_at), received_at, name, email, message, product_slug FROM leads;
+      DROP TABLE leads;
+      ALTER TABLE leads_new RENAME TO leads;
+    `)
+  }
+
+  // 3. Auto-seeding jika database kosong
   const productCountResult = await dbInstance.get<{ count: number }>('SELECT COUNT(*) as count FROM products')
   if (productCountResult && productCountResult.count === 0) {
     if (fs.existsSync(PRODUCTS_JSON)) {
@@ -160,10 +181,13 @@ export async function insertProduct(product: Product): Promise<void> {
 
 export async function updateProduct(product: Product): Promise<void> {
   const db = await getDb()
-  await db.run(
+  const result = await db.run(
     `UPDATE products SET name = ?, niche = ?, short_description = ?, full_description = ?, features = ? WHERE slug = ?`,
     [product.name, product.niche, product.shortDescription, product.fullDescription, JSON.stringify(product.features), product.slug]
   )
+  if (result.changes === 0) {
+    throw new Error('Product not found')
+  }
 }
 
 export async function deleteProductBySlug(slug: string): Promise<void> {
@@ -212,10 +236,13 @@ export async function insertBlog(blog: BlogPost): Promise<void> {
 
 export async function updateBlog(blog: BlogPost): Promise<void> {
   const db = await getDb()
-  await db.run(
+  const result = await db.run(
     `UPDATE blogs SET title = ?, category = ?, date = ?, excerpt = ?, author = ?, content = ? WHERE slug = ?`,
     [blog.title, blog.category, blog.date, blog.excerpt, blog.author, JSON.stringify(blog.content), blog.slug]
   )
+  if (result.changes === 0) {
+    throw new Error('Blog not found')
+  }
 }
 
 export async function deleteBlogBySlug(slug: string): Promise<void> {

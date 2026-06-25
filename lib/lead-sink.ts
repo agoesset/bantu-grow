@@ -16,10 +16,6 @@ export interface LeadSink {
 export const defaultLeadSink: LeadSink = {
   async record(lead: Lead): Promise<void> {
     console.log('[BantuGrow Lead]', JSON.stringify(lead, null, 2))
-    try {
-      await insertLead(lead)
-    } catch (err) {
-      console.error('[BantuGrow LeadSink] Failed to save lead to database:', err)
-    }
+    await insertLead(lead)
   },
 }

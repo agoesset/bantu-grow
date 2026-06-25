@@ -12,7 +12,6 @@ import {
   updateBlog,
   deleteBlogBySlug,
   readLeads,
-  insertLead,
   deleteLeadById,
 } from '@/lib/db'
 import { type Product } from '@/content/products'
