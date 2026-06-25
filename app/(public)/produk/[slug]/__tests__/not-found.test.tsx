@@ -1,13 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import ProductNotFound from '../not-found'
-import GlobalNotFound from '@/app/(public)/not-found'
+import GlobalNotFound from '@/app/not-found'
 
 // Mock Next.js Link
 vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: unknown }) => (
     <a href={href} {...props}>{children}</a>
   ),
+}))
+
+// Mock useTheme and ThemeProvider
+vi.mock('@/components/theme-provider', () => ({
+  useTheme: () => ({
+    theme: 'light',
+    setTheme: vi.fn(),
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 describe('ProductNotFound', () => {

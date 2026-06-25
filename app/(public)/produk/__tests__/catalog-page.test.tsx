@@ -40,7 +40,7 @@ describe('CatalogPage', () => {
   it('shows niche labels on product cards', async () => {
     const jsx = await CatalogPage()
     render(jsx)
-    expect(screen.getByText(/ibadah & komunitas/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/ibadah & komunitas/i).length).toBeGreaterThan(0)
   })
 
   it('renders links to product detail pages', async () => {

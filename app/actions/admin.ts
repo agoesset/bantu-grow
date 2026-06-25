@@ -22,14 +22,14 @@ const ADMIN_COOKIE_NAME = 'bantugrow_admin_session'
 
 // In production, ADMIN_PASSWORD must be set via environment variable.
 // In non-production environments, fall back to 'admin' for development convenience.
-const ADMIN_PASSWORD = (() => {
+function getAdminPassword(): string {
   const envPassword = process.env.ADMIN_PASSWORD
   if (envPassword) return envPassword
   if (process.env.NODE_ENV === 'production') {
     throw new Error('ADMIN_PASSWORD environment variable is required in production')
   }
   return 'admin'
-})()
+}
 
 // In-memory store of valid session tokens
 const validTokens = new Set<string>()
@@ -62,7 +62,7 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
     return { success: false, error: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.' }
   }
 
-  if (password === ADMIN_PASSWORD) {
+  if (password === getAdminPassword()) {
     // In production, use random session tokens for security.
     // In non-production, use a static token for test compatibility.
     const token =

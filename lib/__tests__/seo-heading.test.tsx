@@ -23,6 +23,15 @@ vi.mock('@/app/actions/submit-lead', () => ({
   submitLead: vi.fn().mockResolvedValue({ status: 'success' }),
 }))
 
+// Mock useTheme and ThemeProvider
+vi.mock('@/components/theme-provider', () => ({
+  useTheme: () => ({
+    theme: 'light',
+    setTheme: vi.fn(),
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+}))
+
 // Mock catalog for static pages
 vi.mock('@/lib/catalog', async (importOriginal) => {
   const original = await importOriginal<typeof import('@/lib/catalog')>()
@@ -32,7 +41,7 @@ vi.mock('@/lib/catalog', async (importOriginal) => {
 import HomePage from '@/app/(public)/page'
 import CatalogPage from '@/app/(public)/produk/page'
 import AboutPage from '@/app/(public)/tentang/page'
-import GlobalNotFound from '@/app/(public)/not-found'
+import GlobalNotFound from '@/app/not-found'
 import { products } from '@/content/products'
 import { ContactForm } from '@/app/(public)/kontak/ContactForm'
 
