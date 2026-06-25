@@ -62,9 +62,9 @@ vi.mock('next/image', () => ({
   },
 }))
 
-import HomePage from '@/app/page'
-import CatalogPage from '@/app/produk/page'
-import ProductDetailPage from '@/app/produk/[slug]/page'
+import HomePage from '@/app/(public)/page'
+import CatalogPage from '@/app/(public)/produk/page'
+import ProductDetailPage from '@/app/(public)/produk/[slug]/page'
 import { getAllProducts } from '@/lib/catalog'
 import { copy } from '@/content/copy'
 

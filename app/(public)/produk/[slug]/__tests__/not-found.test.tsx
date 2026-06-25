@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import ProductNotFound from '../not-found'
-import GlobalNotFound from '@/app/not-found'
+import GlobalNotFound from '@/app/(public)/not-found'
 
 // Mock Next.js Link
 vi.mock('next/link', () => ({

@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import { Outfit, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { ThemeProvider } from '@/components/theme-provider'
 
 const outfit = Outfit({
@@ -21,6 +19,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: 'BantuGrow — Solusi SaaS untuk UMKM Indonesia',
   description:
     'BantuGrow menyediakan solusi perangkat lunak (SaaS) yang dirancang khusus untuk membantu UMKM Indonesia berkembang lebih cepat, efisien, dan terorganisir.',
@@ -55,9 +54,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <Header />
           <main className="flex-1">{children}</main>
-          <Footer />
         </ThemeProvider>
       </body>
     </html>
