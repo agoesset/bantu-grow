@@ -19,14 +19,58 @@ import { type BlogPost } from '@/content/blogs'
 import { type Lead } from '@/lib/lead-sink'
 
 const ADMIN_COOKIE_NAME = 'bantugrow_admin_session'
-const SESSION_TOKEN = 'bantugrow_authenticated_admin'
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'
+// In production, ADMIN_PASSWORD must be set via environment variable.
+// In non-production environments, fall back to 'admin' for development convenience.
+const ADMIN_PASSWORD = (() => {
+  const envPassword = process.env.ADMIN_PASSWORD
+  if (envPassword) return envPassword
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('ADMIN_PASSWORD environment variable is required in production')
+  }
+  return 'admin'
+})()
+
+// In-memory store of valid session tokens
+const validTokens = new Set<string>()
+
+// Legacy static token accepted only in non-production for backward compatibility (tests)
+const LEGACY_TOKEN = 'bantugrow_authenticated_admin'
+
+// ─── Login Rate Limiting ───────────────────────────────────────────────────────
+const LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const LOGIN_RATE_LIMIT_MAX = 5
+const loginAttemptMap = new Map<string, number[]>()
+
+function isLoginRateLimited(key: string): boolean {
+  const now = Date.now()
+  const timestamps = loginAttemptMap.get(key) ?? []
+  const recent = timestamps.filter((t) => now - t < LOGIN_RATE_LIMIT_WINDOW_MS)
+  loginAttemptMap.set(key, recent)
+
+  if (recent.length >= LOGIN_RATE_LIMIT_MAX) {
+    return true
+  }
+  recent.push(now)
+  loginAttemptMap.set(key, recent)
+  return false
+}
 
 export async function loginAdmin(password: string): Promise<{ success: boolean; error?: string }> {
+  // Rate limit login attempts (keyed by a generic constant since we don't have IP in server actions easily)
+  if (isLoginRateLimited('global')) {
+    return { success: false, error: 'Terlalu banyak percobaan login. Coba lagi dalam 15 menit.' }
+  }
+
   if (password === ADMIN_PASSWORD) {
+    // In production, use random session tokens for security.
+    // In non-production, use a static token for test compatibility.
+    const token =
+      process.env.NODE_ENV === 'production' ? crypto.randomUUID() : LEGACY_TOKEN
+    validTokens.add(token)
+
     const cookieStore = await cookies()
-    cookieStore.set(ADMIN_COOKIE_NAME, SESSION_TOKEN, {
+    cookieStore.set(ADMIN_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
@@ -40,6 +84,10 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
 
 export async function logoutAdmin(): Promise<{ success: boolean }> {
   const cookieStore = await cookies()
+  const session = cookieStore.get(ADMIN_COOKIE_NAME)
+  if (session?.value) {
+    validTokens.delete(session.value)
+  }
   cookieStore.delete(ADMIN_COOKIE_NAME)
   return { success: true }
 }
@@ -47,7 +95,17 @@ export async function logoutAdmin(): Promise<{ success: boolean }> {
 export async function checkAdminSession(): Promise<boolean> {
   const cookieStore = await cookies()
   const session = cookieStore.get(ADMIN_COOKIE_NAME)
-  return session?.value === SESSION_TOKEN
+  if (!session?.value) return false
+
+  // Check if the token is in our valid tokens set
+  if (validTokens.has(session.value)) return true
+
+  // In non-production, accept legacy static token for backward compatibility
+  if (process.env.NODE_ENV !== 'production' && session.value === LEGACY_TOKEN) {
+    return true
+  }
+
+  return false
 }
 
 // Product mutators

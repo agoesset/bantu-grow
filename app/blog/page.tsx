@@ -2,14 +2,9 @@ import type { Metadata } from 'next'
 import { BlogsSection } from '@/components/blogs-section'
 import { CallToAction } from '@/components/cta'
 import { getAllBlogs } from '@/lib/blog'
-import { blogListMeta } from '@/lib/seo'
+import { blogListMetadata } from '@/lib/seo'
 
-const meta = blogListMeta()
-
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-}
+export const metadata: Metadata = blogListMetadata()
 
 export default async function BlogArchivePage() {
   const posts = await getAllBlogs()

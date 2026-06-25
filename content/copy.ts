@@ -85,9 +85,14 @@ export const copy = {
   // Navigation
   navHome: 'Beranda',
   navProducts: 'Produk',
+  navPricing: 'Harga',
   navBlog: 'Blog',
   navAbout: 'Tentang',
   navContact: 'Kontak',
+
+  // WhatsApp
+  whatsappNumber: '6281234567890',
+  whatsappCta: 'Chat via WhatsApp',
 
   // Blog
   blogHeadline: 'Artikel & Wawasan Terbaru',

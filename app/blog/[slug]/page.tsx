@@ -7,7 +7,7 @@ import { CallToAction } from '@/components/cta'
 import { DecorIcon } from '@/components/decor-icon'
 import { cn } from '@/lib/utils'
 import { getAllBlogs, getBlogBySlug } from '@/lib/blog'
-import { blogPostMeta } from '@/lib/seo'
+import { blogPostMeta, blogPostMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 import { formatDate } from '@/lib/format-date'
 
@@ -26,8 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) {
     return { title: 'Artikel Tidak Ditemukan — BantuGrow' }
   }
-  const meta = blogPostMeta(post)
-  return { title: meta.title, description: meta.description }
+  return blogPostMetadata(post)
 }
 
 export default async function BlogPostDetailPage({ params }: PageProps) {

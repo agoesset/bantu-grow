@@ -7,7 +7,7 @@ import { DecorIcon } from '@/components/decor-icon'
 import { cn } from '@/lib/utils'
 import { getAllProducts, getProductBySlug, buildDetailView } from '@/lib/catalog'
 import { buildContactHref } from '@/lib/contact-link'
-import { productMeta } from '@/lib/seo'
+import { productMeta, productMetadata } from '@/lib/seo'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -24,8 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!product) {
     return { title: 'Produk Tidak Ditemukan — BantuGrow' }
   }
-  const meta = productMeta(product)
-  return { title: meta.title, description: meta.description }
+  return productMetadata(product)
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {

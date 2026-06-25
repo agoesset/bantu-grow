@@ -28,7 +28,8 @@ async function submitAction(
     message: (formData.get('message') as string) ?? '',
     productSlug: (formData.get('productSlug') as string) || undefined,
   }
-  return submitLead(input)
+  const honeypot = (formData.get('company_url') as string) ?? ''
+  return submitLead(input, honeypot)
 }
 
 export function ContactForm({ products, preSelectedSlug }: Props) {
@@ -63,6 +64,12 @@ export function ContactForm({ products, preSelectedSlug }: Props) {
 
   return (
     <form action={formAction} className="w-full flex flex-col gap-6" noValidate>
+      {/* Honeypot field - hidden from real users, bots will fill this */}
+      <div className="absolute -left-[9999px]" aria-hidden="true">
+        <label htmlFor="company_url">Company URL</label>
+        <input type="text" id="company_url" name="company_url" tabIndex={-1} autoComplete="off" />
+      </div>
+
       {state?.status === 'server_error' && (
         <div role="alert" className="rounded-lg bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive flex items-start gap-3">
           <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />

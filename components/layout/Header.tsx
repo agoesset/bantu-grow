@@ -12,6 +12,7 @@ import { copy } from '@/content/copy'
 export const navLinks = [
 	{ href: '/', label: copy.navHome },
 	{ href: '/produk', label: copy.navProducts },
+	{ href: '/harga', label: copy.navPricing },
 	{ href: '/blog', label: copy.navBlog },
 	{ href: '/tentang', label: copy.navAbout },
 	{ href: '/kontak', label: copy.navContact },

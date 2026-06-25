@@ -6,15 +6,10 @@ import { DecorIcon } from '@/components/decor-icon'
 import { CallToAction } from '@/components/cta'
 import { cn } from '@/lib/utils'
 import { getAllProducts, buildCatalogView } from '@/lib/catalog'
-import { catalogMeta } from '@/lib/seo'
+import { catalogMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 
-const meta = catalogMeta()
-
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-}
+export const metadata: Metadata = catalogMetadata()
 
 export default async function CatalogPage() {
   const products = await getAllProducts()

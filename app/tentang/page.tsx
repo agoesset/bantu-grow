@@ -3,15 +3,10 @@ import Link from 'next/link'
 import { Mail, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DecorIcon } from '@/components/decor-icon'
-import { aboutMeta } from '@/lib/seo'
+import { aboutMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 
-const meta = aboutMeta()
-
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-}
+export const metadata: Metadata = aboutMetadata()
 
 export default function AboutPage() {
   return (

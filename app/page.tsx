@@ -8,15 +8,10 @@ import { TestimonialsSection } from '@/components/testimonials-section'
 import { CallToAction } from '@/components/cta'
 import { DecorIcon } from '@/components/decor-icon'
 import { getAllProducts, buildCatalogView } from '@/lib/catalog'
-import { homeMeta } from '@/lib/seo'
+import { homeMetadata } from '@/lib/seo'
 import { copy } from '@/content/copy'
 
-const meta = homeMeta()
-
-export const metadata: Metadata = {
-  title: meta.title,
-  description: meta.description,
-}
+export const metadata: Metadata = homeMetadata()
 
 export default async function HomePage() {
   const products = await getAllProducts()
