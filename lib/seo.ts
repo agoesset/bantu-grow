@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { Product } from '@/content/products'
 import type { BlogPost } from '@/content/blogs'
+import type { CaseStudy } from '@/content/case-studies'
 
 export interface PageMeta {
   title: string
@@ -123,4 +124,46 @@ export function pricingMeta(): Metadata {
   const title = `Harga & Paket — ${SITE_NAME}`
   const description = 'Pilih paket BantuGrow yang sesuai dengan skala bisnis UMKM Anda. Mulai gratis, tanpa biaya tersembunyi.'
   return buildMetadata(title, description)
+}
+
+export function privacyMetadata(): Metadata {
+  return buildMetadata(
+    `Kebijakan Privasi — ${SITE_NAME}`,
+    'Kebijakan privasi BantuGrow menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.'
+  )
+}
+
+export function termsMetadata(): Metadata {
+  return buildMetadata(
+    `Syarat & Ketentuan — ${SITE_NAME}`,
+    'Syarat dan ketentuan penggunaan layanan BantuGrow untuk UMKM Indonesia.'
+  )
+}
+
+export function faqMetadata(): Metadata {
+  return buildMetadata(
+    `FAQ — ${SITE_NAME}`,
+    'Pertanyaan yang sering diajukan tentang BantuGrow, layanan SaaS untuk UMKM Indonesia.'
+  )
+}
+
+export function caseStudiesMetadata(): Metadata {
+  return buildMetadata(
+    `Studi Kasus — ${SITE_NAME}`,
+    'Pelajari bagaimana UMKM Indonesia berhasil bertumbuh bersama solusi SaaS BantuGrow.'
+  )
+}
+
+export function caseStudyMetadata(study: CaseStudy): Metadata {
+  return buildMetadata(
+    `${study.title} — ${SITE_NAME}`,
+    `${study.client}: ${study.challenge.slice(0, 120)}...`
+  )
+}
+
+export function careersMetadata(): Metadata {
+  return buildMetadata(
+    `Karier — ${SITE_NAME}`,
+    'Bergabunglah dengan tim BantuGrow dan bantu jutaan UMKM Indonesia bertumbuh melalui teknologi.'
+  )
 }

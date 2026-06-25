@@ -7,6 +7,7 @@ import { XIcon } from "@/components/icons/x-icon"
 import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { FullWidthDivider } from "@/components/full-width-divider"
+import { NewsletterForm } from "@/components/newsletter-form"
 import { copy } from '@/content/copy'
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
@@ -43,7 +44,7 @@ export function Footer() {
 					</div>
 				</div>
 
-				<div className="col-span-3 w-full md:col-span-1.5 md:col-start-5">
+				<div className="col-span-2 w-full md:col-span-1">
 					<span className="text-foreground font-semibold text-xs uppercase tracking-wider">Navigasi</span>
 					<nav aria-label="Footer navigasi" className="mt-3 flex flex-col gap-2.5">
 						{navLinks.map(({ href, title }) => (
@@ -58,7 +59,22 @@ export function Footer() {
 					</nav>
 				</div>
 
-				<div className="col-span-3 w-full md:col-span-1.5">
+				<div className="col-span-2 w-full md:col-span-1">
+					<span className="text-foreground font-semibold text-xs uppercase tracking-wider">Legal</span>
+					<nav aria-label="Footer legal" className="mt-3 flex flex-col gap-2.5">
+						{legalLinks.map(({ href, title }) => (
+							<Link
+								className="w-max text-sm text-muted-foreground hover:text-foreground transition-colors"
+								href={href}
+								key={title}
+							>
+								{title}
+							</Link>
+						))}
+					</nav>
+				</div>
+
+				<div className="col-span-2 w-full md:col-span-1">
 					<span className="text-foreground font-semibold text-xs uppercase tracking-wider">Kontak</span>
 					<div className="mt-3 flex flex-col gap-2.5">
 						<a
@@ -82,6 +98,22 @@ export function Footer() {
 					</div>
 				</div>
 			</div>
+
+			{/* Newsletter Section */}
+			<div className="px-6 md:px-8 pb-6">
+				<div className="rounded-lg border border-border/80 p-6 bg-card">
+					<div className="flex flex-col md:flex-row md:items-center gap-4">
+						<div className="flex-grow">
+							<h3 className="text-sm font-semibold text-foreground mb-1">Berlangganan Newsletter</h3>
+							<p className="text-xs text-muted-foreground">Dapatkan tips bisnis dan update produk terbaru dari BantuGrow.</p>
+						</div>
+						<div className="md:w-80">
+							<NewsletterForm />
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<FullWidthDivider />
 			<div className="flex items-center justify-center gap-2 py-6">
 				<p className="text-center font-light text-muted-foreground text-xs">
@@ -99,6 +131,12 @@ const navLinks = [
 	{ title: copy.navBlog, href: "/blog" },
 	{ title: copy.navAbout, href: "/tentang" },
 	{ title: copy.navContact, href: "/kontak" },
+	{ title: "FAQ", href: "/faq" },
+]
+
+const legalLinks = [
+	{ title: "Kebijakan Privasi", href: "/privasi" },
+	{ title: "Syarat & Ketentuan", href: "/ketentuan" },
 ]
 
 const socialLinks = [

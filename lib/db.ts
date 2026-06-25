@@ -61,6 +61,11 @@ export async function getDb(): Promise<Database> {
       message TEXT NOT NULL,
       product_slug TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+      email TEXT PRIMARY KEY,
+      subscribed_at TEXT NOT NULL
+    );
   `)
 
   // 2. Migration: ensure leads table has id column as PRIMARY KEY
