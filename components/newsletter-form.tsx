@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export function NewsletterForm() {
   const [email, setEmail] = useState('')
@@ -37,16 +38,16 @@ export function NewsletterForm() {
         <p className="text-sm text-primary font-medium">{message}</p>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-          <input
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Masukkan email Anda"
             required
-            className="flex-grow rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="flex-grow bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             aria-label="Alamat email untuk newsletter"
           />
-          <Button type="submit" size="sm" disabled={status === 'loading'}>
+          <Button type="submit" disabled={status === 'loading'}>
             {status === 'loading' ? 'Mengirim...' : 'Langganan'}
             <Send className="ml-1.5 h-3.5 w-3.5" aria-hidden="true" />
           </Button>

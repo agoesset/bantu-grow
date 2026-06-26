@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
 
         <div className="prose prose-sm md:prose-base prose-neutral dark:prose-invert max-w-none">
           <p className="text-muted-foreground leading-relaxed">
-            Terakhir diperbarui: Januari 2024
+            Terakhir diperbarui: 25 Juni 2026
           </p>
 
           <h2 className="text-xl font-bold text-foreground mt-8 mb-3">1. Informasi yang Kami Kumpulkan</h2>

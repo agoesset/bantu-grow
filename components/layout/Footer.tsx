@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { cn } from "@/lib/utils"
 import { GithubIcon } from "@/components/icons/github-icon"
 import { InstagramIcon } from "@/components/icons/instagram-icon"
@@ -21,6 +22,11 @@ const socialIconMap: Record<SocialLink['platform'], React.ReactNode> = {
 
 export function Footer() {
 	const activeSocialLinks = getActiveSocialLinks()
+	const [year, setYear] = useState(2024)
+
+	useEffect(() => {
+		setYear(new Date().getFullYear())
+	}, [])
 
 	return (
 		<footer
@@ -128,7 +134,7 @@ export function Footer() {
 			<FullWidthDivider />
 			<div className="flex items-center justify-center gap-2 py-6">
 				<p className="text-center font-light text-muted-foreground text-xs">
-					{copy.footerRights}
+					© {year} BantuGrow. Semua hak dilindungi.
 				</p>
 			</div>
 		</footer>
