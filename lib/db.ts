@@ -90,10 +90,16 @@ export async function getDb(): Promise<Database> {
   `)
 
   // 2. Migration: ensure leads table has id column as PRIMARY KEY
-  const leadsSchema = await dbInstance.get<{ sql: string }>(
-    `SELECT sql FROM sqlite_master WHERE type='table' AND name='leads'`
-  )
-  if (leadsSchema && !leadsSchema.sql.includes('id TEXT PRIMARY KEY')) {
+  // Clean up any orphaned leads_new from a previous failed migration
+  await dbInstance.exec(`DROP TABLE IF EXISTS leads_new`)
+
+  const leadsColumns = await dbInstance.all<{ name: string }>(`PRAGMA table_info(leads)`)
+  const leadsColumnNames = new Set(leadsColumns.map((c) => c.name))
+  const hasIdColumn = leadsColumnNames.has('id')
+  const hasPhoneColumn = leadsColumnNames.has('phone')
+  const hasCompanyNameColumn = leadsColumnNames.has('company_name')
+
+  if (leadsColumns.length > 0 && !hasIdColumn) {
     await dbInstance.exec(`
       CREATE TABLE leads_new (
         id TEXT PRIMARY KEY,
@@ -105,18 +111,18 @@ export async function getDb(): Promise<Database> {
         phone TEXT,
         company_name TEXT
       );
-      INSERT INTO leads_new (id, received_at, name, email, message, product_slug)
-        SELECT COALESCE(id, received_at), received_at, name, email, message, product_slug FROM leads;
+      INSERT INTO leads_new (id, received_at, name, email, message, product_slug, phone, company_name)
+        SELECT COALESCE(NULLIF(id, ''), received_at), received_at, name, email, message, product_slug, NULL, NULL FROM leads;
       DROP TABLE leads;
       ALTER TABLE leads_new RENAME TO leads;
     `)
   }
 
   // 2b. Migration: add phone and company_name columns to leads if missing
-  if (leadsSchema && !leadsSchema.sql.includes('phone')) {
+  if (!hasPhoneColumn) {
     await dbInstance.exec(`ALTER TABLE leads ADD COLUMN phone TEXT`)
   }
-  if (leadsSchema && !leadsSchema.sql.includes('company_name')) {
+  if (!hasCompanyNameColumn) {
     await dbInstance.exec(`ALTER TABLE leads ADD COLUMN company_name TEXT`)
   }
 
