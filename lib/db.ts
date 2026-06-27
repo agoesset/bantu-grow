@@ -418,6 +418,11 @@ export async function readDemoRequests(): Promise<DemoRequest[]> {
   }
 }
 
+export async function deleteDemoRequestById(id: string): Promise<void> {
+  const db = await getDb()
+  await db.run('DELETE FROM demo_requests WHERE id = ?', [id])
+}
+
 // ─── Admin Users (Multi-user structural prep) ──────────────────────────────────
 // TODO: Full multi-user migration - replace single-password login with per-user auth.
 // Currently the admin login still uses the single ADMIN_PASSWORD environment variable.

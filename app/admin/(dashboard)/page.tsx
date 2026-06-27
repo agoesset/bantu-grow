@@ -1,6 +1,6 @@
-import { readProducts, readBlogs, readLeads } from '@/lib/db'
+import { readProducts, readBlogs, readLeads, readDemoRequests } from '@/lib/db'
 import Link from 'next/link'
-import { ShoppingBag, BookOpen, MessageSquare, ArrowRight, Clock, BarChart3 } from 'lucide-react'
+import { ShoppingBag, BookOpen, MessageSquare, ArrowRight, Clock, BarChart3, Calendar } from 'lucide-react'
 import React from 'react'
 import { LeadChart } from './LeadChart'
 
@@ -8,6 +8,7 @@ export default async function AdminDashboardPage() {
   const products = await readProducts()
   const blogs = await readBlogs()
   const leads = await readLeads()
+  const demoRequests = await readDemoRequests()
 
   // Calculate lead trends for last 7 days
   const now = new Date()
@@ -52,6 +53,13 @@ export default async function AdminDashboardPage() {
       color: 'text-emerald-500 bg-emerald-500/10',
       href: '/admin/leads',
     },
+    {
+      label: 'Permintaan Demo',
+      value: demoRequests.length,
+      icon: Calendar,
+      color: 'text-purple-500 bg-purple-500/10',
+      href: '/admin/demo-requests',
+    },
   ]
 
   const recentLeads = [...leads]
@@ -71,7 +79,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => {
           const Icon = stat.icon
           return (

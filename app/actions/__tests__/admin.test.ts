@@ -48,16 +48,29 @@ interface Lead {
   productSlug?: string
 }
 
+interface DemoRequest {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  company?: string
+  productInterest?: string
+  preferredTime?: string
+  createdAt: string
+}
+
 // Gunakan deklarasi global agar tidak bermasalah dengan Vitest hoisting closure
 declare global {
   var __mockProducts: Product[]
   var __mockBlogs: BlogPost[]
   var __mockLeads: Lead[]
+  var __mockDemoRequests: DemoRequest[]
 }
 
 globalThis.__mockProducts = []
 globalThis.__mockBlogs = []
 globalThis.__mockLeads = []
+globalThis.__mockDemoRequests = []
 
 vi.mock('@/lib/db', () => ({
   readProducts: vi.fn().mockImplementation(() => {
@@ -95,6 +108,12 @@ vi.mock('@/lib/db', () => ({
   deleteLeadById: vi.fn().mockImplementation((id: string) => {
     globalThis.__mockLeads = globalThis.__mockLeads.filter((x) => x.id !== id)
   }),
+  readDemoRequests: vi.fn().mockImplementation(() => {
+    return globalThis.__mockDemoRequests
+  }),
+  deleteDemoRequestById: vi.fn().mockImplementation((id: string) => {
+    globalThis.__mockDemoRequests = globalThis.__mockDemoRequests.filter((x) => x.id !== id)
+  }),
 }))
 
 import {
@@ -106,7 +125,9 @@ import {
   saveBlog,
   deleteBlog,
   getLeadsList,
-  deleteLead
+  deleteLead,
+  getDemoRequestsList,
+  deleteDemoRequest
 } from '../admin'
 
 describe('Admin Server Actions', () => {
@@ -123,6 +144,10 @@ describe('Admin Server Actions', () => {
     
     globalThis.__mockLeads = [
       { id: 'lead-uuid-1', receivedAt: '2026-06-25T00:00:00.000Z', name: 'User', email: 'user@test.com', message: 'Hi' }
+    ]
+
+    globalThis.__mockDemoRequests = [
+      { id: 'demo-uuid-1', name: 'Demo User', email: 'demouser@test.com', company: 'Test Corp', createdAt: '2026-06-26T00:00:00.000Z' }
     ]
   })
 
@@ -211,6 +236,19 @@ describe('Admin Server Actions', () => {
       expect(res.success).toBe(true)
       expect(globalThis.__mockLeads).toHaveLength(0)
     })
+
+    it('gets demo requests list', async () => {
+      const res = await getDemoRequestsList()
+      expect(res.success).toBe(true)
+      expect(res.demoRequests).toHaveLength(1)
+      expect(res.demoRequests[0].name).toBe('Demo User')
+    })
+
+    it('deletes a demo request by id', async () => {
+      const res = await deleteDemoRequest('demo-uuid-1')
+      expect(res.success).toBe(true)
+      expect(globalThis.__mockDemoRequests).toHaveLength(0)
+    })
   })
 
   describe('unauthenticated operations prevention', () => {
@@ -223,6 +261,18 @@ describe('Admin Server Actions', () => {
 
     it('prevents deleting product if not authenticated', async () => {
       const res = await deleteProduct('p1')
+      expect(res.success).toBe(false)
+      expect(res.error).toBe('Tidak terotorisasi')
+    })
+
+    it('prevents getting demo requests if not authenticated', async () => {
+      const res = await getDemoRequestsList()
+      expect(res.success).toBe(false)
+      expect(res.error).toBe('Tidak terotorisasi')
+    })
+
+    it('prevents deleting demo request if not authenticated', async () => {
+      const res = await deleteDemoRequest('demo-uuid-1')
       expect(res.success).toBe(false)
       expect(res.error).toBe('Tidak terotorisasi')
     })

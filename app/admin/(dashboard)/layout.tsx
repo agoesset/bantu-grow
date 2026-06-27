@@ -2,7 +2,7 @@ import { checkAdminSession, logoutAdmin } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
-import { LayoutDashboard, ShoppingBag, BookOpen, MessageSquare, LogOut, ArrowLeft } from 'lucide-react'
+import { LayoutDashboard, ShoppingBag, BookOpen, MessageSquare, LogOut, ArrowLeft, Calendar } from 'lucide-react'
 import React from 'react'
 
 export default async function AdminDashboardLayout({
@@ -26,6 +26,7 @@ export default async function AdminDashboardLayout({
     { href: '/admin/products', label: 'Produk', icon: ShoppingBag },
     { href: '/admin/blogs', label: 'Blog', icon: BookOpen },
     { href: '/admin/leads', label: 'Pesan Masuk', icon: MessageSquare },
+    { href: '/admin/demo-requests', label: 'Permintaan Demo', icon: Calendar },
   ]
 
   return (

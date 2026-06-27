@@ -13,6 +13,9 @@ import {
   deleteBlogBySlug,
   readLeads,
   deleteLeadById,
+  readDemoRequests,
+  deleteDemoRequestById,
+  type DemoRequest,
 } from '@/lib/db'
 import { type Product } from '@/content/products'
 import { type BlogPost } from '@/content/blogs'
@@ -224,6 +227,36 @@ export async function deleteLead(id: string): Promise<{ success: boolean; error?
 
   try {
     await deleteLeadById(id)
+    revalidatePath('/admin', 'layout')
+    return { success: true }
+  } catch (err) {
+    return { success: false, error: (err as Error).message || 'Terjadi kesalahan sistem' }
+  }
+}
+
+// Demo Requests
+export async function getDemoRequestsList(): Promise<{ success: boolean; demoRequests: DemoRequest[]; error?: string }> {
+  const isAuthed = await checkAdminSession()
+  if (!isAuthed) {
+    return { success: false, demoRequests: [], error: 'Tidak terotorisasi' }
+  }
+
+  try {
+    const demoRequests = await readDemoRequests()
+    return { success: true, demoRequests }
+  } catch (err) {
+    return { success: false, demoRequests: [], error: (err as Error).message || 'Terjadi kesalahan sistem' }
+  }
+}
+
+export async function deleteDemoRequest(id: string): Promise<{ success: boolean; error?: string }> {
+  const isAuthed = await checkAdminSession()
+  if (!isAuthed) {
+    return { success: false, error: 'Tidak terotorisasi' }
+  }
+
+  try {
+    await deleteDemoRequestById(id)
     revalidatePath('/admin', 'layout')
     return { success: true }
   } catch (err) {
