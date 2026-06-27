@@ -51,12 +51,6 @@ export function Header() {
 					>
 						Minta Demo
 					</Link>
-					<Link
-						href="/kontak"
-						className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-					>
-						Hubungi Kami
-					</Link>
 				</div>
 				<div className="flex items-center gap-2">
 					<ThemeToggle />

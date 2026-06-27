@@ -52,11 +52,11 @@ export function MobileNav() {
 						</div>
 						<div className="mt-12 flex flex-col gap-2">
 							<Link
-								href="/kontak"
-								className={cn(buttonVariants({ variant: "outline" }), "w-full text-center py-2 px-3 block")}
+								href="/demo"
+								className={cn(buttonVariants({ variant: "default" }), "w-full text-center py-2 px-3 block")}
 								onClick={() => setOpen(false)}
 							>
-								Hubungi Kami
+								Minta Demo
 							</Link>
 						</div>
 					</nav>
