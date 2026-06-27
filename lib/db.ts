@@ -93,8 +93,12 @@ export async function getDb(): Promise<Database> {
   // Clean up any orphaned leads_new from a previous failed migration
   await dbInstance.exec(`DROP TABLE IF EXISTS leads_new`)
 
-  const leadsColumns = await dbInstance.all<{ name: string }>(`PRAGMA table_info(leads)`)
-  const leadsColumnNames = new Set(leadsColumns.map((c) => c.name))
+  interface ColumnInfo {
+    name: string
+  }
+
+  const leadsColumns = await dbInstance.all<ColumnInfo>(`PRAGMA table_info(leads)`)
+  const leadsColumnNames = new Set(leadsColumns.map((c: ColumnInfo) => c.name))
   const hasIdColumn = leadsColumnNames.has('id')
   const hasPhoneColumn = leadsColumnNames.has('phone')
   const hasCompanyNameColumn = leadsColumnNames.has('company_name')
