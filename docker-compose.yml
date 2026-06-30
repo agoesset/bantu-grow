@@ -1,8 +1,6 @@
 services:
   bantugrow:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/agoesset/bantu-grow:latest
     container_name: bantugrow-app
     ports:
       - "3000:3000"
