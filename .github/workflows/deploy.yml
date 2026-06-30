@@ -73,7 +73,7 @@ jobs:
             git reset --hard origin/main
 
             echo "=== Login to GHCR ==="
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
             echo "=== Pull latest image ==="
             sudo docker compose pull
